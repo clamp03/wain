@@ -8,6 +8,9 @@ int main(int argc, char* argv[]) {
     const char* fname = "hell.wasm";
 
     Reader r(fname);
-    r.read();
+    if (r.open()) {
+        r.read();
+        r.close();
+    }
     return 0;
 }

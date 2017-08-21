@@ -10,6 +10,8 @@ class Reader {
 public:
     explicit Reader(const char* fname);
     ~Reader();
+    bool open();
+    void close();
     void read();
 
 private:
@@ -35,6 +37,25 @@ private:
     int8_t readVarInt7();
     int32_t readVarInt32();
     int64_t readVarInt64();
+
+    const char* readBytes(uint32_t len);
+
+    bool readTypeSection(uint32_t len, const char* data);
+
+    enum class SectionId {
+        NAME = 0,
+        TYPE,
+        IMPORT,
+        FUNCTION,
+        TABLE,
+        MEMORY,
+        GLOBAL,
+        EXPORT,
+        START,
+        ELEMENT,
+        CODE,
+        DATA
+    };
 
     FILE* fp_;
 };
