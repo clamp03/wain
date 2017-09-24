@@ -40,7 +40,7 @@ private:
 
     const char* readBytes(uint32_t len);
 
-    bool readTypeSection(uint32_t len, const char* data);
+    bool readTypeSection(uint32_t len);
 
     enum class SectionId {
         NAME = 0,

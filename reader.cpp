@@ -65,14 +65,15 @@ bool ReaderV1::readSections() {
             name = readBytes(name_len);
             payload_len -= (name_len + 4); // FIXME: correct length of name and name_len
         }
-        const char* payload_data = readBytes(payload_len);
+        cerr << "Section: " << (int)id << " " << (uint)payload_len << endl;
 
+        // TODO: check type index is increasing
         switch (static_cast<SectionId>(id)) {
             case SectionId::NAME:
                 cerr << "Section Id: " << static_cast<int>(id) << endl;
                 NOT_YET_IMPLEMENTED
             case SectionId::TYPE:
-                readTypeSection(payload_len, payload_data);
+                readTypeSection(payload_len);
                 break;
             case SectionId::IMPORT:
             case SectionId::FUNCTION:
@@ -84,6 +85,7 @@ bool ReaderV1::readSections() {
             case SectionId::ELEMENT:
             case SectionId::CODE:
             case SectionId::DATA:
+            default:
                 cerr << "Section Id: " << static_cast<int>(id) << endl;
                 NOT_YET_IMPLEMENTED
         }
@@ -92,13 +94,15 @@ bool ReaderV1::readSections() {
 }
 
 uint8_t ReaderV1::readVarUint1() {
-    NOT_YET_IMPLEMENTED
+    uint8_t val = 0;
+    fread(&val, 1, 1, fp_);
+    return val & 0x1l;
 }
 
 uint8_t ReaderV1::readVarUint7() {
     uint8_t val = 0;
     fread(&val, 1, 1, fp_);
-    return val;
+    return val & 0x7f;
 }
 
 uint32_t ReaderV1::readVarUint32() {
@@ -115,7 +119,9 @@ uint32_t ReaderV1::readVarUint32() {
 }
 
 int8_t ReaderV1::readVarInt7() {
-    NOT_YET_IMPLEMENTED
+    int8_t val = 0;
+    fread(&val, 1, 1, fp_);
+    return val & 0x7f;
 }
 
 int32_t ReaderV1::readVarInt32() {
@@ -132,6 +138,21 @@ const char* ReaderV1::readBytes(uint32_t len) {
     return val;
 }
 
-bool ReaderV1::readTypeSection(uint32_t len, const char* data) {
-    NOT_YET_IMPLEMENTED
+bool ReaderV1::readTypeSection(uint32_t len) {
+    uint32_t type_count = readVarUint32();
+    cerr << "TYPE COUNT: " << type_count << endl;
+    for (uint32_t type = 0; type < type_count; type++) {
+        int8_t form = readVarInt7();
+        uint32_t param_count = readVarUint32();
+        for (uint32_t param = 0; param < param_count; param++) {
+            // TODO
+            int8_t value_type = readVarInt7();
+        }
+        uint8_t return_count = readVarUint1();
+        if (return_count) {
+            // TODO
+            int8_t return_type = readVarInt7();
+        }
+    }
+    return true;
 }
