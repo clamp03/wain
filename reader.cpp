@@ -183,6 +183,21 @@ bool ReaderV1::readGlobalSection(uint32_t payload_len) {
         int8_t content_type = readVarInt7();
         uint8_t mutability = readVarUint1();
         // TODO init init_expr
+        while (true) {
+            uint8_t opcode = static_cast<uint8_t>(*readBytes(1));
+            if (opcode == 0x41 || opcode == 0x43) {
+                readBytes(4); // FIXME
+            } else if (opcode == 0x42 || opcode == 0x44) {
+                readBytes(8); // FIXME
+            } else if (opcode == 0x23) {
+                uint32_t global_index = readVarUint32(); // FIXME
+            } else if (opcode == 0x0b) {
+                break;
+            } else {
+                cerr << "opcode: " << (int)opcode << endl;
+                DEV_ASSERT(false, "Invalid opcode in global section");
+            }
+        }
     }
     uint32_t end = ftell(fp_);
     return ((end - start) == payload_len);
