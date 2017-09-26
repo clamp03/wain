@@ -74,12 +74,12 @@ bool ReaderV1::readSections() {
                 NOT_YET_IMPLEMENTED
             case SectionId::TYPE:
                 if (!readTypeSection(payload_len)) {
-                    DEV_ASSERT(false, "INVALID PAYLOAD");
+                    DEV_ASSERT(false, "INVALID TYPE SECTION");
                 }
                 break;
             case SectionId::IMPORT:
                 if (!readImportSection(payload_len)) {
-                    DEV_ASSERT(false, "INVALID PAYLOAD");
+                    DEV_ASSERT(false, "INVALID IMPORT SECTION");
                 }
                 break;
             case SectionId::FUNCTION:
@@ -103,7 +103,7 @@ bool ReaderV1::readTypeSection(uint32_t payload_len) {
     uint32_t type_count = readVarUint32();
     uint32_t start = ftell(fp_);
     cerr << "TYPE COUNT: " << type_count << endl;
-    for (uint32_t type = 0; type < type_count; type++) {
+    for (uint32_t entry = 0; entry < type_count; entry++) {
         int8_t form = readVarInt7();
         uint32_t param_count = readVarUint32();
         cerr << "FORM: " << (int)form << " " << param_count << endl;
@@ -127,6 +127,39 @@ bool ReaderV1::readImportSection(uint32_t payload_len) {
     uint32_t import_count = readVarUint32();
     uint32_t start = ftell(fp_);
     cerr << "IMPORT COUNT: " << import_count << endl;
+    for (uint32_t entry = 0; entry < import_count; entry++) {
+        uint32_t module_len = readVarUint32();
+        const char* module_str = readBytes(module_len);
+        uint32_t field_len = readVarUint32();
+        const char* field_str = readBytes(field_len);
+        ExternalKind kind = static_cast<ExternalKind>(*readBytes(1));
+        if (kind == ExternalKind::Function) {
+            uint32_t type = readVarUint32();
+        } else if (kind == ExternalKind::Table) {
+            // element_type
+            int8_t element_type = readVarInt7();
+            // limits
+            uint8_t flags = readVarUint1();
+            uint32_t initial = readVarUint32();
+            if (flags) {
+                uint32_t maximum = readVarUint32();
+            }
+        } else if (kind == ExternalKind::Memory) {
+            // limits
+            uint8_t flags = readVarUint1();
+            uint32_t initial = readVarUint32();
+            if (flags) {
+                uint32_t maximum = readVarUint32();
+            }
+        } else if (kind == ExternalKind::Global) {
+            int8_t content_type = readVarInt7();
+            uint8_t mutability = readVarUint1();
+        } else {
+            DEV_ASSERT(false, "INVALID EXTERNAL KIND");
+        }
+    }
+    uint32_t end = ftell(fp_);
+    return ((end - start + 1) == payload_len);
 }
 
 uint8_t ReaderV1::readVarUint1() {

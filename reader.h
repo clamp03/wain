@@ -57,6 +57,12 @@ private:
         CODE,
         DATA
     };
+    enum class ExternalKind {
+        Function = 0,
+        Table,
+        Memory,
+        Global
+    };
 
     FILE* fp_;
 };
