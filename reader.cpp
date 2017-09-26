@@ -65,17 +65,23 @@ bool ReaderV1::readSections() {
             name = readBytes(name_len);
             payload_len -= (name_len + 4); // FIXME: correct length of name and name_len
         }
+
         cerr << "Section: " << (int)id << " " << (uint)payload_len << endl;
 
         // TODO: check type index is increasing
         switch (static_cast<SectionId>(id)) {
             case SectionId::NAME:
-                cerr << "Section Id: " << static_cast<int>(id) << endl;
                 NOT_YET_IMPLEMENTED
             case SectionId::TYPE:
-                readTypeSection(payload_len);
+                if (!readTypeSection(payload_len)) {
+                    DEV_ASSERT(false, "INVALID PAYLOAD");
+                }
                 break;
             case SectionId::IMPORT:
+                if (!readImportSection(payload_len)) {
+                    DEV_ASSERT(false, "INVALID PAYLOAD");
+                }
+                break;
             case SectionId::FUNCTION:
             case SectionId::TABLE:
             case SectionId::MEMORY:
@@ -93,10 +99,40 @@ bool ReaderV1::readSections() {
     return true;
 }
 
+bool ReaderV1::readTypeSection(uint32_t payload_len) {
+    uint32_t type_count = readVarUint32();
+    uint32_t start = ftell(fp_);
+    cerr << "TYPE COUNT: " << type_count << endl;
+    for (uint32_t type = 0; type < type_count; type++) {
+        int8_t form = readVarInt7();
+        uint32_t param_count = readVarUint32();
+        cerr << "FORM: " << (int)form << " " << param_count << endl;
+        for (uint32_t param = 0; param < param_count; param++) {
+            int8_t value_type = readVarInt7();
+            // TODO
+            cerr << "VALUE TYPE: " << (int)value_type << endl;
+        }
+        uint8_t return_count = readVarUint1();
+        if (return_count) {
+            int8_t return_type = readVarInt7();
+            // TODO
+            cerr << "RETURN TYPE: " << (int)return_type << endl;
+        }
+    }
+    uint32_t end = ftell(fp_);
+    return ((end - start + 1) == payload_len);
+}
+
+bool ReaderV1::readImportSection(uint32_t payload_len) {
+    uint32_t import_count = readVarUint32();
+    uint32_t start = ftell(fp_);
+    cerr << "IMPORT COUNT: " << import_count << endl;
+}
+
 uint8_t ReaderV1::readVarUint1() {
     uint8_t val = 0;
     fread(&val, 1, 1, fp_);
-    return val & 0x1l;
+    return val & 0x1;
 }
 
 uint8_t ReaderV1::readVarUint7() {
@@ -108,7 +144,7 @@ uint8_t ReaderV1::readVarUint7() {
 uint32_t ReaderV1::readVarUint32() {
     uint32_t val = 0;
     uint32_t shift = 0;
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 5; i++) {
         uint8_t byte = 0;
         fread(&byte, 1, 1, fp_);
         val |= (byte & 0x7f) << shift;
@@ -138,21 +174,4 @@ const char* ReaderV1::readBytes(uint32_t len) {
     return val;
 }
 
-bool ReaderV1::readTypeSection(uint32_t len) {
-    uint32_t type_count = readVarUint32();
-    cerr << "TYPE COUNT: " << type_count << endl;
-    for (uint32_t type = 0; type < type_count; type++) {
-        int8_t form = readVarInt7();
-        uint32_t param_count = readVarUint32();
-        for (uint32_t param = 0; param < param_count; param++) {
-            // TODO
-            int8_t value_type = readVarInt7();
-        }
-        uint8_t return_count = readVarUint1();
-        if (return_count) {
-            // TODO
-            int8_t return_type = readVarInt7();
-        }
-    }
-    return true;
-}
+
