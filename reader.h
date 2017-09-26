@@ -42,6 +42,8 @@ private:
 
     bool readTypeSection(uint32_t payload_len);
     bool readImportSection(uint32_t payload_len);
+    bool readFunctionSection(uint32_t payload_len);
+    bool readGlobalSection(uint32_t payload_len);
 
     enum class SectionId {
         NAME = 0,
