@@ -14,7 +14,6 @@ Reader::Reader(const char* fname)
           version_(0) {}
 
 Reader::~Reader() {
-    close();
 }
 
 bool Reader::open() {
@@ -30,10 +29,13 @@ void Reader::close() {
 }
 
 void Reader::read() {
+    fseek(fp_, 0 , SEEK_END);
+    uint64_t size = ftell(fp_);
+    rewind(fp_);
     DEV_ASSERT(readMagicNumber(), "Invalid magic number");
     DEV_ASSERT(readVersion(), "Invalid version number");
     if (version_ == 1) {
-        ReaderV1 v1(fp_);
+        ReaderV1 v1(fp_, size);
         DEV_ASSERT(v1.readSections(), "Invalid sections");
     }
 }
@@ -51,22 +53,26 @@ bool Reader::readVersion() {
     return fread(&version_, 1, VERSION_SIZE, fp_) == VERSION_SIZE;
 }
 
-ReaderV1::ReaderV1(FILE* fp)
-        : fp_(fp) {}
+ReaderV1::ReaderV1(FILE* fp, uint64_t size)
+        : fp_(fp), size_(size) {
+}
 
 bool ReaderV1::readSections() {
-    while (true) {
+    uint8_t prev_id = 0;
+    while (ftell(fp_) < size_) {
         uint8_t id = readVarUint7();
         uint32_t payload_len = readVarUint32();
         uint32_t name_len = 0;
         const char* name = nullptr;
         if (id == 0) {
+            uint32_t name_start = ftell(fp_);
             name_len = readVarUint32();
             name = readBytes(name_len);
-            payload_len -= (name_len + 4); // FIXME: correct length of name and name_len
+            uint32_t name_end = ftell(fp_);
+            payload_len -= (name_end - name_start);
         }
 
-        // TODO: check type index is increasing
+        DEV_ASSERT(id >= prev_id || id == 0, "INVALID SECTION ID");
         switch (static_cast<SectionId>(id)) {
             case SectionId::NAME:
                 NOT_YET_IMPLEMENTED
@@ -112,10 +118,15 @@ bool ReaderV1::readSections() {
                 }
                 break;
             case SectionId::DATA:
+                if (!readDataSection(payload_len)) {
+                    DEV_ASSERT(false, "Invalid data section");
+                }
+                break;
             default:
                 cerr << "Section Id: " << static_cast<int>(id) << endl;
                 NOT_YET_IMPLEMENTED
         }
+        prev_id = id;
     }
     return true;
 }
@@ -191,14 +202,13 @@ bool ReaderV1::readFunctionSection(uint32_t payload_len) {
 bool ReaderV1::readGlobalSection(uint32_t payload_len) {
     uint32_t start = ftell(fp_);
     uint32_t global_count = readVarUint32();
-    cout << "ReadGlobalSection: " << global_count << " " << payload_len << endl;
     for (uint32_t entry = 0; entry < global_count; entry++) {
         // global_type
         int8_t content_type = readVarInt7();
         uint8_t mutability = readVarUint1();
         // TODO init init_expr
         while (true) {
-            uint8_t opcode = static_cast<uint8_t>(*readBytes(1));
+            uint8_t opcode = readOpcode();
             if (opcode == 0x41) {
                 readVarInt32(); // FIXME
             } else if (opcode == 0x42) {
@@ -242,7 +252,7 @@ bool ReaderV1::readElementSection(uint32_t payload_len) {
     for (uint32_t entry = 0; entry < element_count; entry++) {
         uint32_t index = readVarUint32();
         while (true) {
-            uint8_t opcode = static_cast<uint8_t>(*readBytes(1));
+            uint8_t opcode = readOpcode();
             if (opcode == 0x41) {
                 readVarInt32(); // FIXME
             } else if (opcode == 0x42) {
@@ -274,7 +284,90 @@ bool ReaderV1::readCodeSection(uint32_t payload_len) {
     uint32_t start = ftell(fp_);
     uint32_t code_count = readVarUint32();
     for (uint32_t entry = 0; entry < code_count; entry++) {
-        NOT_YET_IMPLEMENTED
+        uint32_t body_size = readVarUint32();
+        uint32_t start_body = ftell(fp_);
+        uint32_t local_count = readVarUint32();
+        for (uint32_t local_entry = 0; local_entry < local_count; local_entry++) {
+            uint32_t local_entry_count = readVarUint32();
+            int8_t value_type = readVarInt7();
+        }
+
+        uint8_t opcode;
+        uint32_t idx = 0;
+        uint32_t block = 1;
+        do {
+            opcode = readOpcode();
+            if (opcode >= 0x02 && opcode <= 0x04) {
+                int8_t block_type = readVarInt7();
+                block++;
+            } else if (opcode >= 0x0c && opcode <= 0x0d) {
+                uint32_t relative_depth = readVarUint32();
+            } else if (opcode == 0x0b) {
+                block--;
+            } else if (opcode == 0x0e) {
+                uint32_t target_count = readVarUint32();
+                for (uint32_t target_entry = 0; target_entry < target_count; target_entry++) {
+                    uint32_t target_table = readVarUint32();
+                }
+                uint32_t default_target = readVarUint32();
+            } else if (opcode == 0x10) {
+                uint32_t function_index = readVarUint32();
+            } else if (opcode == 0x11) {
+                uint32_t type_index = readVarUint32();
+                int8_t reserved = readVarUint1();
+            } else if (opcode >= 0x20 && opcode <= 0x24) {
+                uint32_t index = readVarUint32();
+            } else if (opcode >= 0x28 && opcode <= 0x3e) {
+                uint32_t flags = readVarUint32();
+                uint32_t offset = readVarUint32();
+            } else if (opcode >= 0x3f && opcode <= 0x40) {
+                uint8_t reserved = readVarUint1();
+            } else if (opcode == 0x41) {
+                int32_t value = readVarInt32();
+            } else if (opcode == 0x42) {
+                int64_t value = readVarInt64();
+            } else if (opcode == 0x43) {
+                uint32_t value = readUint32();
+            } else if (opcode == 0x44) {
+                uint64_t value = readUint64();
+            }
+
+        } while (block != 0 || opcode != 0xb);
+        uint32_t end_body = ftell(fp_);
+        if (!((end_body - start_body) == body_size)) return false;
+    }
+
+    uint32_t end = ftell(fp_);
+    return ((end - start) == payload_len);
+}
+
+bool ReaderV1::readDataSection(uint32_t payload_len) {
+    uint32_t start = ftell(fp_);
+    uint32_t count = readVarUint32();
+    for (uint32_t entry = 0; entry < count; entry++) {
+        uint32_t index = readVarUint32();
+        while (true) {
+            uint8_t opcode = readOpcode();
+            if (opcode == 0x41) {
+                readVarInt32(); // FIXME
+            } else if (opcode == 0x42) {
+                readVarInt64(); // FIXME
+            } else if (opcode == 0x43) {
+                readBytes(4); // FIXME
+            } else if (opcode == 0x44) {
+                readBytes(8); // FIXME
+            } else if (opcode == 0x23) {
+                uint32_t global_index = readVarUint32(); // FIXME
+            } else if (opcode == 0x0b) {
+                break;
+            } else {
+                uint32_t mid = ftell(fp_);
+                cerr << "[" << entry << "] opcode: " << (int)opcode << " " << (mid - start) << endl;
+                DEV_ASSERT(false, "Invalid opcode in global section");
+            }
+        }
+        uint32_t size = readVarUint32();
+        const char* data = readBytes(size);
     }
     uint32_t end = ftell(fp_);
     return ((end - start) == payload_len);
@@ -343,6 +436,24 @@ int64_t ReaderV1::readVarInt64() {
         val |= (~0 << shift);
     }
     return val;
+}
+
+uint32_t ReaderV1::readUint32() {
+    uint32_t val = 0;
+    fread(&val, 1, 4, fp_);
+    return val;
+}
+
+uint64_t ReaderV1::readUint64() {
+    uint64_t val = 0;
+    fread(&val, 1, 8, fp_);
+    return val;
+}
+
+uint8_t ReaderV1::readOpcode() {
+    int8_t opcode = 0;
+    fread(&opcode, 1, 1, fp_);
+    return opcode;
 }
 
 const char* ReaderV1::readBytes(uint32_t len) {

@@ -26,7 +26,7 @@ private:
 
 class ReaderV1 {
 public:
-    explicit ReaderV1(FILE* fp);
+    explicit ReaderV1(FILE* fp, uint64_t size);
     bool readSections();
 
 private:
@@ -38,6 +38,10 @@ private:
     int32_t readVarInt32();
     int64_t readVarInt64();
 
+    uint32_t readUint32();
+    uint64_t readUint64();
+
+    uint8_t readOpcode();
     const char* readBytes(uint32_t len);
 
     bool readTypeSection(uint32_t payload_len);
@@ -47,6 +51,7 @@ private:
     bool readExportSection(uint32_t payload_len);
     bool readElementSection(uint32_t payload_len);
     bool readCodeSection(uint32_t payload_len);
+    bool readDataSection(uint32_t payload_len);
 
     enum class SectionId {
         NAME = 0,
@@ -70,6 +75,7 @@ private:
     };
 
     FILE* fp_;
+    uint64_t size_;
 };
 
 #endif
