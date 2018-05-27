@@ -1,0 +1,1 @@
+./wasmIntrp hell.wasm

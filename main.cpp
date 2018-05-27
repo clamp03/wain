@@ -3,9 +3,7 @@
 int main(int argc, char* argv[]) {
     if (argc == 0) return -1;
 
-    // TODO: Configuration from command arguments
-    // char* fname = argv[1];
-    const char* fname = "hell.wasm";
+    char* fname = argv[1];
 
     Reader r(fname);
     if (r.open()) {
