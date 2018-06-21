@@ -1,14 +1,19 @@
-#include "reader.h"
+#include <iostream>
+
+#include "module.h"
 
 int main(int argc, char* argv[]) {
-    if (argc == 0) return -1;
+    if (argc != 2) {
+        cerr << "Invalid usage" << endl;
+        cerr << "./wasmIntrp <file name>" << endl;
+        return -1;
+    }
 
     char* fname = argv[1];
 
-    Reader r(fname);
-    if (r.open()) {
-        r.read();
-        r.close();
+    Module m;
+    if (m.loadFile(fname)) {
+        m.run();
     }
     return 0;
 }
