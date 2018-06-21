@@ -42,8 +42,9 @@ bool Module::load(const uint8_t* buf, size_t size) {
 
     DEV_ASSERT(version_ == 1, "Not supported version number");
     if (version_ == 1) {
-        sections_ = new SectionsV1();
-        sections_->load(l);
+        sections_ = new SectionsV1(l);
+        sections_->load();
+        delete sections_; // FIXME
     } else {
         // Currently, there is only version 1
         return false;

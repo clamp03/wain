@@ -9,15 +9,17 @@ using namespace std;
 
 class Sections {
 public:
-    virtual bool load(Loader& l) = 0;
-    virtual bool loadTypeSection(Loader& l) = 0;
-    virtual bool loadImportSection(Loader& l) = 0;
-    virtual bool loadFunctionSection(Loader& l) = 0;
-    virtual bool loadGlobalSection(Loader& l) = 0;
-    virtual bool loadExportSection(Loader& l) = 0;
-    virtual bool loadElementSection(Loader& l) = 0;
-    virtual bool loadCodeSection(Loader& l) = 0;
-    virtual bool loadDataSection(Loader& l) = 0;
+    Sections();
+    virtual ~Sections();
+    virtual bool load() = 0;
+    virtual bool loadTypeSection() = 0;
+    virtual bool loadImportSection() = 0;
+    virtual bool loadFunctionSection() = 0;
+    virtual bool loadGlobalSection() = 0;
+    virtual bool loadExportSection() = 0;
+    virtual bool loadElementSection() = 0;
+    virtual bool loadCodeSection() = 0;
+    virtual bool loadDataSection() = 0;
 
     enum class SectionId {
         NAME = 0,
@@ -44,18 +46,21 @@ public:
 
 class SectionsV1: public Sections {
 public:
-    virtual bool load(Loader& l);
-    virtual bool loadTypeSection(Loader& l);
-    virtual bool loadImportSection(Loader& l);
-    virtual bool loadFunctionSection(Loader& l);
-    virtual bool loadGlobalSection(Loader& l);
-    virtual bool loadExportSection(Loader& l);
-    virtual bool loadElementSection(Loader& l);
-    virtual bool loadCodeSection(Loader& l);
-    virtual bool loadDataSection(Loader& l);
+    explicit SectionsV1(Loader& l);
+    virtual ~SectionsV1();
+    virtual bool load();
+    virtual bool loadTypeSection();
+    virtual bool loadImportSection();
+    virtual bool loadFunctionSection();
+    virtual bool loadGlobalSection();
+    virtual bool loadExportSection();
+    virtual bool loadElementSection();
+    virtual bool loadCodeSection();
+    virtual bool loadDataSection();
 
 private:
-    MemoryManager mem;
+    MemoryManager mem_;
+    Loader loader_;
 };
 
 #endif // SECTION_H

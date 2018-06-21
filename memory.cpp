@@ -3,7 +3,6 @@
 #include "common.h"
 #include "memory.h"
 
-
 MemoryManager::MemoryManager() {
     head_ = static_cast<BufNode*>(malloc(sizeof(BufNode)));
     tail_ = static_cast<BufNode*>(malloc(sizeof(BufNode)));
