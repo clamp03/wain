@@ -7,6 +7,8 @@ SET (SRC_FILES
     main.cpp
     memory.cpp
     loader.cpp
+    type.cpp
+    type_section.cpp
     section.cpp
     module.cpp
 )

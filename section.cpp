@@ -115,19 +115,24 @@ private:
 bool SectionsV1::loadTypeSection() {
     PayloadChecker checker(loader_);
 
+    type_section_ = new TypeSection();
     uint32_t type_count = loader_.loadVarUint32();
     for (uint32_t entry = 0; entry < type_count; entry++) {
+        FuncType* func = new FuncType();
         int8_t form = loader_.loadVarInt7();
+        func->setForm(form);
+
         uint32_t param_count = loader_.loadVarUint32();
         for (uint32_t param = 0; param < param_count; param++) {
-            int8_t value_type = loader_.loadVarInt7();
-            // TODO
+            ValueType value_type = static_cast<ValueType>(loader_.loadVarInt7());
+            func->addParamType(value_type);
         }
         uint8_t return_count = loader_.loadVarUint1();
         if (return_count) {
-            int8_t return_type = loader_.loadVarInt7();
-            // TODO
+            ValueType return_type = static_cast<ValueType>(loader_.loadVarInt7());
+            func->setReturnType(return_type);
         }
+        type_section_->addFuncType(func);
     }
     return true;
 }

@@ -4,6 +4,29 @@
 #include "common.h"
 #include "loader.h"
 #include "memory.h"
+#include "type_section.h"
+
+enum class SectionId {
+    NAME = 0,
+    TYPE,
+    IMPORT,
+    FUNCTION,
+    TABLE,
+    MEMORY,
+    GLOBAL,
+    EXPORT,
+    START,
+    ELEMENT,
+    CODE,
+    DATA
+};
+
+enum class ExternalKind {
+    Function = 0,
+    Table,
+    Memory,
+    Global
+};
 
 class Sections {
 public:
@@ -18,29 +41,9 @@ public:
     virtual bool loadElementSection() = 0;
     virtual bool loadCodeSection() = 0;
     virtual bool loadDataSection() = 0;
-
-    enum class SectionId {
-        NAME = 0,
-        TYPE,
-        IMPORT,
-        FUNCTION,
-        TABLE,
-        MEMORY,
-        GLOBAL,
-        EXPORT,
-        START,
-        ELEMENT,
-        CODE,
-        DATA
-    };
-
-    enum class ExternalKind {
-        Function = 0,
-        Table,
-        Memory,
-        Global
-    };
 };
+
+class TypeSection;
 
 class SectionsV1: public Sections {
 public:
@@ -59,6 +62,7 @@ public:
 private:
     MemoryManager mem_;
     Loader& loader_;
+    TypeSection* type_section_;
 };
 
 #endif // SECTION_H
