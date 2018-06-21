@@ -1,11 +1,6 @@
-#include <assert.h>
 #include <string.h>
 
-#include <iostream>
-
-#include "common.h"
 #include "loader.h"
-
 #include "module.h"
 
 using namespace std;

@@ -2,8 +2,9 @@
 #define MODULE_H
 
 #include "common.h"
-#include "loader.h"
-#include "section.h"
+
+class Loader;
+class Sections;
 
 class Module {
 public:

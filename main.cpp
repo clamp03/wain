@@ -1,6 +1,9 @@
-#include <iostream>
-
+#include "common.h"
 #include "module.h"
+
+using namespace std;
+
+class Module;
 
 int main(int argc, char* argv[]) {
     if (argc != 2) {

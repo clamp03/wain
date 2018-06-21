@@ -5,8 +5,6 @@
 #include "loader.h"
 #include "memory.h"
 
-using namespace std;
-
 class Sections {
 public:
     Sections();

@@ -1,5 +1,6 @@
-#include <iostream>
 #include "section.h"
+#include "loader.h"
+#include "memory.h"
 
 using namespace std;
 

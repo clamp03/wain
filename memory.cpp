@@ -1,6 +1,3 @@
-#include <iostream>
-
-#include "common.h"
 #include "memory.h"
 
 MemoryManager::MemoryManager() {

@@ -1,9 +1,11 @@
-#include <iostream>
 #include <stdio.h>
 #include <string.h>
 
 #include "module.h"
+#include "loader.h"
 #include "section.h"
+
+using namespace std;
 
 Module::Module()
     : version_(0),
