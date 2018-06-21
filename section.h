@@ -58,7 +58,7 @@ public:
 
 private:
     MemoryManager mem_;
-    Loader loader_;
+    Loader& loader_;
 };
 
 #endif // SECTION_H
