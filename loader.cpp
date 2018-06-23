@@ -3,8 +3,6 @@
 #include "loader.h"
 #include "module.h"
 
-using namespace std;
-
 Loader::Loader(const uint8_t* buf, size_t size)
         : buf_(buf),
           idx_(0),

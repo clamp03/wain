@@ -9,8 +9,9 @@
 
 class TypeSection {
 public:
-    uint32_t getTypeCount();
+    uint32_t count();
     void addFuncType(const FuncType* func_type);
+    const FuncType* funcType(uint32_t idx);
 
 private:
     uint32_t type_count_;

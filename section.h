@@ -45,7 +45,7 @@ public:
 
 class TypeSection;
 
-class SectionsV1: public Sections {
+class SectionsV1 : public Sections {
 public:
     explicit SectionsV1(Loader& l);
     virtual ~SectionsV1();

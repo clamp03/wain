@@ -5,8 +5,6 @@
 #include "loader.h"
 #include "section.h"
 
-using namespace std;
-
 Module::Module()
     : version_(0),
       sections_(nullptr) {
@@ -17,7 +15,7 @@ bool Module::loadFile(const char* fname) {
     FILE* fp = fopen(fname, "rb");
     uint8_t* buf = nullptr;
     if (!fp) {
-        cerr << "Cannot open file: " << fname << endl;
+        std::cerr << "Cannot open file: " << fname << std::endl;
         return false;
     }
 

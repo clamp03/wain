@@ -2,8 +2,6 @@
 #include "loader.h"
 #include "memory.h"
 
-using namespace std;
-
 Sections::Sections() {
 }
 
@@ -23,21 +21,10 @@ bool SectionsV1::load() {
         uint8_t id = loader_.loadVarUint7();
 
         DEV_ASSERT(id >= prev_id || id == 0, "INVALID SECTION ID");
+        printf("%d\n", (int)id);
         switch (static_cast<SectionId>(id)) {
             case SectionId::NAME:
                 NOT_YET_IMPLEMENTED
-                /* TODO
-                if (id == 0) {
-                    uint32_t name_len = 0;
-                    uint32_t name_start = loader_.index();
-                    name_len = loader_.loadVarUint32();
-                    char* name = static_cast<char*>(mem_.allocate(module_len));
-                    loader_.loadBytes(name, name_len);
-                    uint32_t name_end = loader_.index();
-                    payload_len -= (name_end - name_start);
-                }
-                */
-
             case SectionId::TYPE:
                 if (!loadTypeSection()) {
                     DEV_ASSERT(false, "Invalid type section");
@@ -85,7 +72,7 @@ bool SectionsV1::load() {
                 }
                 break;
             default:
-                cerr << "Section Id: " << static_cast<int>(id) << endl;
+                DEV_ASSERT(false, "Invalid section");
                 NOT_YET_IMPLEMENTED
         }
         prev_id = id;

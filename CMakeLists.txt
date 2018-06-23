@@ -2,15 +2,19 @@ CMAKE_MINIMUM_REQUIRED (VERSION 3.5)
 PROJECT ("WASM-INTERPRETER")
 
 SET (TARGET "wasmIntrp")
+SET (SRC_SECTION
+    section.cpp
+    type_section.cpp
+    import_section.cpp
+)
 
 SET (SRC_FILES
     main.cpp
     memory.cpp
     loader.cpp
     type.cpp
-    type_section.cpp
-    section.cpp
     module.cpp
+    ${SRC_SECTION}
 )
 
 ADD_EXECUTABLE (${TARGET} ${SRC_FILES})

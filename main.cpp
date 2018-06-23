@@ -1,14 +1,12 @@
 #include "common.h"
 #include "module.h"
 
-using namespace std;
-
 class Module;
 
 int main(int argc, char* argv[]) {
     if (argc != 2) {
-        cerr << "Invalid usage" << endl;
-        cerr << "./wasmIntrp <file name>" << endl;
+        std::cerr << "Invalid usage" << std::endl;
+        std::cerr << "./wasmIntrp <file name>" << std::endl;
         return -1;
     }
 
