@@ -4,8 +4,9 @@
 #include "common.h"
 
 struct BufNode {
-    BufNode* prev;
     BufNode* next;
+    size_t size;
+    size_t offset;
     uint8_t* buf;
 };
 
@@ -14,11 +15,11 @@ public:
     MemoryManager();
     ~MemoryManager();
     void* allocate(size_t size);
-    void deallocate(BufNode* buf);
+    void deallocateAll();
 
 private:
     BufNode* head_;
-    BufNode* tail_;
+    BufNode* curr_;
 };
 
 #endif // MEM_H
