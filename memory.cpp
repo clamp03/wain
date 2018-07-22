@@ -5,17 +5,21 @@ MemoryManager::MemoryManager() {
     tail_ = static_cast<BufNode*>(malloc(sizeof(BufNode)));
     head_->prev = nullptr;
     head_->next = tail_;
+    head_->buf = nullptr;
     tail_->prev = head_;
     tail_->next = nullptr;
+    tail_->buf = nullptr;
 }
 
 MemoryManager::~MemoryManager() {
-    BufNode* curr = head_;
-    while (curr != nullptr) {
+    BufNode* curr = head_->next;
+    while (curr != tail_) {
         BufNode* cand = curr;
         curr = curr->next;
-        free(cand);
+        deallocate(cand);
     }
+    free(head_);
+    free(tail_);
 }
 
 void* MemoryManager::allocate(size_t size) {
@@ -23,9 +27,11 @@ void* MemoryManager::allocate(size_t size) {
     BufNode* last = tail_->prev;
 
     last->next = curr;
+    tail_->prev = curr;
     curr->prev = last;
     curr->next = tail_;
-    return curr;
+    curr->buf = static_cast<uint8_t*>(malloc(size));
+    return curr->buf;
 }
 
 void MemoryManager::deallocate(BufNode* buf) {
@@ -33,5 +39,6 @@ void MemoryManager::deallocate(BufNode* buf) {
     BufNode* next = buf->next;
     prev->next = next;
     next->prev = prev;
-    free (buf);
+    free(buf->buf);
+    free(buf);
 }
