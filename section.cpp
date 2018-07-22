@@ -1,6 +1,5 @@
+#include "common.h"
 #include "section.h"
-#include "loader.h"
-#include "memory.h"
 
 Sections::Sections() {
 }
@@ -178,8 +177,10 @@ bool SectionsV1::loadImportSection() {
 bool SectionsV1::loadFunctionSection() {
     PayloadChecker checker(loader_);
     uint32_t function_count = loader_.loadVarUint32();
+    function_section_ = new FunctionSection();
     for (uint32_t entry = 0; entry < function_count; entry++) {
         uint32_t type = loader_.loadVarUint32();
+        function_section_->addFuncType(type);
     }
     return true;
 }

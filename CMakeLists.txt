@@ -6,6 +6,7 @@ SET (SRC_SECTION
     section.cpp
     type_section.cpp
     import_section.cpp
+    function_section.cpp
 )
 
 SET (SRC_FILES

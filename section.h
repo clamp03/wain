@@ -1,9 +1,26 @@
 #ifndef SECTION_H 
 #define SECTION_H
 
-#include "section_common.h"
+#include "memory.h"
+#include "loader.h"
 #include "type_section.h"
 #include "import_section.h"
+#include "function_section.h"
+
+enum class SectionId {
+    NAME = 0,
+    TYPE,
+    IMPORT,
+    FUNCTION,
+    TABLE,
+    MEMORY,
+    GLOBAL,
+    EXPORT,
+    START,
+    ELEMENT,
+    CODE,
+    DATA
+};
 
 class Sections {
 public:
@@ -41,6 +58,7 @@ private:
     Loader& loader_;
     TypeSection* type_section_;
     ImportSection* import_section_;
+    FunctionSection* function_section_;
 };
 
 #endif // SECTION_H

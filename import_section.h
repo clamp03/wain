@@ -3,10 +3,7 @@
 
 #include <vector>
 
-#include "section_common.h"
 #include "type.h"
-
-enum class ExternalKind;
 
 class ImportType {
 public:

@@ -1,9 +1,6 @@
 #ifndef LOADER_H
 #define LOADER_H
 
-#include "common.h"
-
-
 class Loader {
 public:
     Loader(const uint8_t* buf, size_t size);

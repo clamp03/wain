@@ -1,10 +1,10 @@
 #ifndef TYPE_SECTION_H 
+#include "common.h"
 #define TYPE_SECTION_H
 
 #include <vector>
 
 #include "common.h"
-#include "section.h"
 #include "type.h"
 
 class TypeSection {

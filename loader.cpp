@@ -1,5 +1,6 @@
 #include <string.h>
 
+#include "common.h"
 #include "loader.h"
 #include "module.h"
 

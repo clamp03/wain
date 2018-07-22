@@ -3,8 +3,6 @@
 
 #include <vector>
 
-#include "section_common.h"
-
 #define I32 0x7F;
 #define I64 0x7E;
 #define F32 0x7D;
@@ -83,6 +81,13 @@ public:
 
 private:
     ResizableLimits limits_;
+};
+
+enum class ExternalKind {
+    Function = 0,
+    Table,
+    Memory,
+    Global
 };
 
 #endif // TYPE_H

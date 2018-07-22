@@ -1,3 +1,4 @@
+#include "common.h"
 #include "import_section.h"
 
 ImportTypeFunction::ImportTypeFunction(uint32_t type)
