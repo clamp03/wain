@@ -51,17 +51,17 @@ uint8_t GlobalType::mutability() {
     return mutability_;
 }
 
-TableType::TableType(ElemType element_type, uint8_t flags, uint32_t initial, uint32_t maximum)
+TableType::TableType(ElemType element_type, ResizableLimits limits)
         : element_type_(element_type)
-        , limits_(flags, initial, maximum) {
+        , limits_(limits) {
 }
 
 ElemType TableType::elementType() {
     return element_type_;
 }
 
-MemoryType::MemoryType(uint8_t flags, uint32_t initial, uint32_t maximum)
-        : limits_(flags, initial, maximum) {
+MemoryType::MemoryType(ResizableLimits limits)
+        : limits_(limits) {
 }
 
 ResizableLimits::ResizableLimits(uint8_t flags, uint32_t initial, uint32_t maximum)

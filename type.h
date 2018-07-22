@@ -66,7 +66,7 @@ private:
 
 class TableType {
 public:
-    TableType(ElemType element_type, uint8_t flags, uint32_t initial, uint32_t maximum = 0);
+    TableType(ElemType element_type, ResizableLimits limits);
 
     ElemType elementType();
 
@@ -77,7 +77,7 @@ private:
 
 class MemoryType {
 public:
-    MemoryType(uint8_t flags, uint32_t initial, uint32_t maximum = 0);
+    MemoryType(ResizableLimits limits);
 
 private:
     ResizableLimits limits_;

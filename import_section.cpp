@@ -9,16 +9,16 @@ ExternalKind ImportTypeFunction::externalKind() {
     return ExternalKind::Function;
 }
 
-ImportTypeTable::ImportTypeTable(ElemType element_type, uint8_t flags, uint32_t initial, uint32_t maximum)
-        : type_(element_type, flags, initial, maximum) {
+ImportTypeTable::ImportTypeTable(ElemType element_type, ResizableLimits limits)
+        : type_(element_type, limits) {
 }
 
 ExternalKind ImportTypeTable::externalKind() {
     return ExternalKind::Table;
 }
 
-ImportTypeMemory::ImportTypeMemory(uint8_t flags, uint32_t initial, uint32_t maximum)
-        : type_(flags, initial, maximum) {
+ImportTypeMemory::ImportTypeMemory(ResizableLimits limits)
+        : type_(limits) {
 }
 
 ExternalKind ImportTypeMemory::externalKind() {

@@ -1,6 +1,5 @@
 #include <string.h>
 
-#include "common.h"
 #include "loader.h"
 #include "module.h"
 
@@ -90,6 +89,16 @@ uint8_t Loader::loadOpcode() {
 void Loader::loadBytes(void* buf, size_t len) {
     memcpy(buf, &buf_[idx_], len);
     idx_ += len;
+}
+
+ResizableLimits Loader::loadResizableLimits() {
+    uint8_t flags = loadVarUint1();
+    uint32_t initial = loadVarUint32();
+    uint32_t maximum = 0;
+    if (flags) {
+        maximum = loadVarUint32();
+    }
+    return ResizableLimits(flags, initial, maximum);
 }
 
 size_t Loader::index() {

@@ -1,6 +1,9 @@
 #ifndef LOADER_H
 #define LOADER_H
 
+#include "common.h"
+#include "type.h"
+
 class Loader {
 public:
     Loader(const uint8_t* buf, size_t size);
@@ -18,6 +21,8 @@ public:
 
     uint8_t loadOpcode();
     void loadBytes(void* buf, size_t len);
+
+    ResizableLimits loadResizableLimits();
 
     size_t index();
     size_t size();

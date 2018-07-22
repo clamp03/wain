@@ -21,7 +21,7 @@ private:
 
 class ImportTypeTable : public ImportType {
 public:
-    ImportTypeTable(ElemType element_type, uint8_t flags, uint32_t initial, uint32_t maximum = 0);
+    ImportTypeTable(ElemType element_type, ResizableLimits limits);
     virtual ExternalKind externalKind();
 
 private:
@@ -30,7 +30,7 @@ private:
 
 class ImportTypeMemory: public ImportType {
 public:
-    ImportTypeMemory(uint8_t flags, uint32_t initial, uint32_t maximum = 0);
+    ImportTypeMemory(ResizableLimits limits);
     virtual ExternalKind externalKind();
 
 private:

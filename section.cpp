@@ -142,25 +142,10 @@ bool SectionsV1::loadImportSection() {
             uint32_t type = loader_.loadVarUint32();
             import_type = new ImportTypeFunction(type);
         } else if (kind == ExternalKind::Table) {
-            // element_type
             int8_t element_type = loader_.loadVarInt7();
-            // limits
-            uint8_t flags = loader_.loadVarUint1();
-            uint32_t initial = loader_.loadVarUint32();
-            uint32_t maximum = 0;
-            if (flags) {
-                maximum = loader_.loadVarUint32();
-            }
-            import_type = new ImportTypeTable(element_type, flags, initial, maximum);
+            import_type = new ImportTypeTable(element_type, loader_.loadResizableLimits()); // TODO: Check memory for ResizableLimits reference passing
         } else if (kind == ExternalKind::Memory) {
-            // limits
-            uint8_t flags = loader_.loadVarUint1();
-            uint32_t initial = loader_.loadVarUint32();
-            uint32_t maximum = 0;
-            if (flags) {
-                maximum = loader_.loadVarUint32();
-            }
-            import_type = new ImportTypeMemory(flags, initial, maximum);
+            import_type = new ImportTypeMemory(loader_.loadResizableLimits()); // TODO: Check memory for ResizableLimits reference passing
         } else if (kind == ExternalKind::Global) {
             int8_t content_type = loader_.loadVarInt7();
             uint8_t mutability = loader_.loadVarUint1();
