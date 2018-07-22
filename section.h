@@ -6,6 +6,7 @@
 #include "type_section.h"
 #include "import_section.h"
 #include "function_section.h"
+#include "global_section.h"
 
 enum class SectionId {
     NAME = 0,
@@ -59,6 +60,7 @@ private:
     TypeSection* type_section_;
     ImportSection* import_section_;
     FunctionSection* function_section_;
+    GlobalSection* global_section_; // TODO
 };
 
 #endif // SECTION_H
