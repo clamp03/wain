@@ -39,8 +39,8 @@ ValueType FuncType::returnType() {
 }
 
 GlobalType::GlobalType(ValueType content_type, uint8_t mutability)
-        : content_type_(content_type),
-          mutability_(mutability_) {
+        : content_type_(content_type)
+        , mutability_(mutability_) {
 }
 
 ValueType GlobalType::contentType() {
@@ -52,8 +52,8 @@ uint8_t GlobalType::mutability() {
 }
 
 TableType::TableType(ElemType element_type, uint8_t flags, uint32_t initial, uint32_t maximum)
-        : element_type_(element_type),
-          limits_(flags, initial, maximum) {
+        : element_type_(element_type)
+        , limits_(flags, initial, maximum) {
 }
 
 ElemType TableType::elementType() {
@@ -65,8 +65,8 @@ MemoryType::MemoryType(uint8_t flags, uint32_t initial, uint32_t maximum)
 }
 
 ResizableLimits::ResizableLimits(uint8_t flags, uint32_t initial, uint32_t maximum)
-        : flags_(flags),
-          initial_(initial),
-          maximum_(maximum) {
+        : flags_(flags)
+        , initial_(initial)
+        , maximum_(maximum) {
     DEV_ASSERT(flags || !maximum, "Invalid resiable limits");
 }

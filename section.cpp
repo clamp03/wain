@@ -126,40 +126,51 @@ bool SectionsV1::loadTypeSection() {
 
 bool SectionsV1::loadImportSection() {
     PayloadChecker checker(loader_);
+
+    import_section_ = new ImportSection();
     uint32_t import_count = loader_.loadVarUint32();
     for (uint32_t entry = 0; entry < import_count; entry++) {
         uint32_t module_len = loader_.loadVarUint32();
-        char* module_str = static_cast<char*>(mem_.allocate(module_len));
+        uint8_t* module_str = static_cast<uint8_t*>(mem_.allocate(module_len));
         loader_.loadBytes(module_str, module_len);
 
         uint32_t field_len = loader_.loadVarUint32();
-        char* field_str = static_cast<char*>(mem_.allocate(field_len));
+        uint8_t* field_str = static_cast<uint8_t*>(mem_.allocate(field_len));
         loader_.loadBytes(field_str, field_len);
         ExternalKind kind = static_cast<ExternalKind>(loader_.loadVarUint7());
+        ImportType* import_type;
         if (kind == ExternalKind::Function) {
             uint32_t type = loader_.loadVarUint32();
+            import_type = new ImportTypeFunction(type);
         } else if (kind == ExternalKind::Table) {
             // element_type
             int8_t element_type = loader_.loadVarInt7();
             // limits
             uint8_t flags = loader_.loadVarUint1();
             uint32_t initial = loader_.loadVarUint32();
+            uint32_t maximum = 0;
             if (flags) {
-                uint32_t maximum = loader_.loadVarUint32();
+                maximum = loader_.loadVarUint32();
             }
+            import_type = new ImportTypeTable(element_type, flags, initial, maximum);
         } else if (kind == ExternalKind::Memory) {
             // limits
             uint8_t flags = loader_.loadVarUint1();
             uint32_t initial = loader_.loadVarUint32();
+            uint32_t maximum = 0;
             if (flags) {
-                uint32_t maximum = loader_.loadVarUint32();
+                maximum = loader_.loadVarUint32();
             }
+            import_type = new ImportTypeMemory(flags, initial, maximum);
         } else if (kind == ExternalKind::Global) {
             int8_t content_type = loader_.loadVarInt7();
             uint8_t mutability = loader_.loadVarUint1();
+            import_type = new ImportTypeGlobal(content_type, mutability);
         } else {
             DEV_ASSERT(false, "INVALID EXTERNAL KIND");
         }
+        ImportEntry* import_entry = new ImportEntry(module_len, module_str, field_len, field_str, import_type);
+        import_section_->addImportEntry(import_entry);
     }
     return true;
 }

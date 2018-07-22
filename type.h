@@ -3,7 +3,7 @@
 
 #include <vector>
 
-#include "common.h"
+#include "section_common.h"
 
 #define I32 0x7F;
 #define I64 0x7E;

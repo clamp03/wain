@@ -3,9 +3,10 @@
 
 #include <vector>
 
-#include "common.h"
-#include "section.h"
+#include "section_common.h"
 #include "type.h"
+
+enum class ExternalKind;
 
 class ImportType {
 public:
@@ -14,6 +15,7 @@ public:
 
 class ImportTypeFunction : public ImportType {
 public:
+    ImportTypeFunction(uint32_t type);
     virtual ExternalKind externalKind();
 
 private:
@@ -22,6 +24,7 @@ private:
 
 class ImportTypeTable : public ImportType {
 public:
+    ImportTypeTable(ElemType element_type, uint8_t flags, uint32_t initial, uint32_t maximum = 0);
     virtual ExternalKind externalKind();
 
 private:
@@ -30,6 +33,7 @@ private:
 
 class ImportTypeMemory: public ImportType {
 public:
+    ImportTypeMemory(uint8_t flags, uint32_t initial, uint32_t maximum = 0);
     virtual ExternalKind externalKind();
 
 private:
@@ -38,6 +42,7 @@ private:
 
 class ImportTypeGlobal : public ImportType {
 public:
+    ImportTypeGlobal(ValueType content_type, uint8_t mutability);
     virtual ExternalKind externalKind();
 
 private:
@@ -46,6 +51,7 @@ private:
 
 class ImportEntry {
 public:
+    ImportEntry(uint32_t module_len, uint8_t* module_str, uint32_t field_len, uint8_t* field_str, ImportType* type);
 
 private:
     uint32_t module_len_;
