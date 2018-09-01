@@ -8,7 +8,12 @@ Sections::~Sections() {
 }
 
 SectionsV1::SectionsV1(Loader& l)
-    : loader_(l) {
+    : loader_(l)
+    , type_section_(nullptr)
+    , import_section_(nullptr)
+    , function_section_(nullptr)
+    , global_section_(nullptr)
+    , export_section_(nullptr) {
 }
 
 SectionsV1::~SectionsV1() {
@@ -20,7 +25,6 @@ bool SectionsV1::load() {
         uint8_t id = loader_.loadVarUint7();
 
         DEV_ASSERT(id >= prev_id || id == 0, "INVALID SECTION ID");
-        printf("%d\n", (int)id);
         switch (static_cast<SectionId>(id)) {
             case SectionId::NAME:
                 NOT_YET_IMPLEMENTED
@@ -202,13 +206,17 @@ bool SectionsV1::loadGlobalSection() {
 
 bool SectionsV1::loadExportSection() {
     PayloadChecker checker(loader_);
+
+    export_section_ = new ExportSection();
     uint32_t export_count = loader_.loadVarUint32();
     for (uint32_t entry = 0; entry < export_count; entry++) {
         uint32_t field_len = loader_.loadVarUint32();
-        char* field_str = static_cast<char*>(mem_.allocate(field_len));
+        uint8_t* field_str = static_cast<uint8_t*>(mem_.allocate(field_len));
         loader_.loadBytes(field_str, field_len);
         ExternalKind kind = static_cast<ExternalKind>(loader_.loadVarUint7());
         uint32_t index = loader_.loadVarUint32();
+        ExportEntry* export_entry = new ExportEntry(field_len, field_str, kind, index);
+        export_section_->addExportEntry(export_entry);
     }
 
     return true;

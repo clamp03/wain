@@ -8,6 +8,7 @@ SET (SRC_SECTION
     import_section.cpp
     function_section.cpp
     global_section.cpp
+    export_section.cpp
     operator.cpp
 )
 
