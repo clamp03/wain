@@ -5,14 +5,15 @@ SET (TARGET "wasmIntrp")
 SET (SRC_SECTION
     section.cpp
     section_v1.cpp
+    instruction.cpp
+    init.cpp
     type_section.cpp
     import_section.cpp
     function_section.cpp
     global_section.cpp
     export_section.cpp
     element_section.cpp
-    instruction.cpp
-    init.cpp
+    data_section.cpp
 )
 
 SET (SRC_FILES

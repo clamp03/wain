@@ -280,13 +280,17 @@ bool SectionsV1::loadCodeSection() {
 bool SectionsV1::loadDataSection() {
     PayloadChecker checker(loader_);
 
+    data_section_ = new DataSection();
+
     uint32_t count = loader_.loadVarUint32();
     for (uint32_t entry = 0; entry < count; entry++) {
         uint32_t index = loader_.loadVarUint32();
         InitExpr* offset = loadInitExpr();
         uint32_t size = loader_.loadVarUint32();
-        char* data = static_cast<char*>(mem_.allocate(size));
+        uint8_t* data = static_cast<uint8_t*>(mem_.allocate(size));
         loader_.loadBytes(data, size);
+        DataSegment* segment = new DataSegment(index, offset, size, data);
+        data_section_->addDataSegment(segment);
     }
     return true;
 }
