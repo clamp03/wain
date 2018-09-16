@@ -3,7 +3,7 @@
 
 #include "module.h"
 #include "loader.h"
-#include "section.h"
+#include "section_v1.h"
 
 Module::Module()
     : version_(0),

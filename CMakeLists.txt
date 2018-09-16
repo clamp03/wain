@@ -4,6 +4,7 @@ PROJECT ("WASM-INTERPRETER")
 SET (TARGET "wasmIntrp")
 SET (SRC_SECTION
     section.cpp
+    section_v1.cpp
     type_section.cpp
     import_section.cpp
     function_section.cpp
