@@ -203,14 +203,19 @@ bool SectionsV1::loadExportSection() {
 
 bool SectionsV1::loadElementSection() {
     PayloadChecker checker(loader_);
+
+    element_section_ = new ElementSection();
     uint32_t element_count = loader_.loadVarUint32();
     for (uint32_t entry = 0; entry < element_count; entry++) {
         uint32_t index = loader_.loadVarUint32();
         InitExpr* offset = loadInitExpr();
+        ElementSegment* segment = new ElementSegment(index, offset);
         uint32_t num_elem = loader_.loadVarUint32();
         for (uint32_t elem_entry = 0; elem_entry < num_elem; elem_entry++) {
             uint32_t elem = loader_.loadVarUint32();
+            segment->addElement(elem);
         }
+        element_section_->addElementSegment(segment);
     }
     return true;
 }
@@ -278,24 +283,7 @@ bool SectionsV1::loadDataSection() {
     uint32_t count = loader_.loadVarUint32();
     for (uint32_t entry = 0; entry < count; entry++) {
         uint32_t index = loader_.loadVarUint32();
-        while (true) {
-            uint8_t opcode = loader_.loadOpcode();
-            if (opcode == 0x41) {
-                loader_.loadVarInt32(); // FIXME
-            } else if (opcode == 0x42) {
-                loader_.loadVarInt64(); // FIXME
-            } else if (opcode == 0x43) {
-                loader_.loadUint32(); // FIXME
-            } else if (opcode == 0x44) {
-                loader_.loadUint64(); // FIXME
-            } else if (opcode == 0x23) {
-                uint32_t global_index = loader_.loadVarUint32(); // FIXME
-            } else if (opcode == 0x0b) {
-                break;
-            } else {
-                DEV_ASSERT(false, "Invalid opcode in global section");
-            }
-        }
+        InitExpr* offset = loadInitExpr();
         uint32_t size = loader_.loadVarUint32();
         char* data = static_cast<char*>(mem_.allocate(size));
         loader_.loadBytes(data, size);

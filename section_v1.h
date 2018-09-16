@@ -8,6 +8,7 @@
 #include "function_section.h"
 #include "global_section.h"
 #include "export_section.h"
+#include "element_section.h"
 #include "section.h"
 
 class SectionsV1 : public Sections {
@@ -34,5 +35,6 @@ private:
     FunctionSection* function_section_;
     GlobalSection* global_section_;
     ExportSection* export_section_;
+    ElementSection* element_section_;
 };
 #endif // SECTION_V1_H

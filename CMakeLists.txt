@@ -10,6 +10,7 @@ SET (SRC_SECTION
     function_section.cpp
     global_section.cpp
     export_section.cpp
+    element_section.cpp
     instruction.cpp
     init.cpp
 )
