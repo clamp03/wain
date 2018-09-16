@@ -3,15 +3,16 @@
 
 #include <vector>
 
+#include "init.h"
 #include "type.h"
 
 class GlobalEntry {
 public:
-    GlobalEntry(ValueType content_type, uint8_t mutability/*, InitExpr* init*/); // TODO
+    GlobalEntry(ValueType content_type, uint8_t mutability, InitExpr* init);
 
 private:
     GlobalType type_;
-    // InitExpr* init_; // TODO
+    InitExpr* init_;
 };
 
 class GlobalSection {

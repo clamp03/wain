@@ -25,12 +25,14 @@ public:
     virtual bool loadDataSection();
 
 private:
+    InitExpr* loadInitExpr();
+
     MemoryManager mem_;
     Loader& loader_;
     TypeSection* type_section_;
     ImportSection* import_section_;
     FunctionSection* function_section_;
-    GlobalSection* global_section_; // TODO
+    GlobalSection* global_section_;
     ExportSection* export_section_;
 };
 #endif // SECTION_V1_H

@@ -10,7 +10,8 @@ SET (SRC_SECTION
     function_section.cpp
     global_section.cpp
     export_section.cpp
-    operator.cpp
+    instruction.cpp
+    init.cpp
 )
 
 SET (SRC_FILES

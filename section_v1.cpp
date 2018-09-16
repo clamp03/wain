@@ -1,5 +1,6 @@
 #include "common.h"
 #include "section_v1.h"
+#include "instruction.h"
 
 SectionsV1::SectionsV1(Loader& l)
     : loader_(l)
@@ -170,30 +171,14 @@ bool SectionsV1::loadFunctionSection() {
 
 bool SectionsV1::loadGlobalSection() {
     PayloadChecker checker(loader_);
+    global_section_ = new GlobalSection();
     uint32_t global_count = loader_.loadVarUint32();
     for (uint32_t entry = 0; entry < global_count; entry++) {
         // global_type
         int8_t content_type = loader_.loadVarInt7();
         uint8_t mutability = loader_.loadVarUint1();
-        // TODO init init_expr
-        while (true) {
-            uint8_t opcode = loader_.loadOpcode();
-            if (opcode == 0x41) {
-                loader_.loadVarInt32(); // FIXME
-            } else if (opcode == 0x42) {
-                loader_.loadVarInt64(); // FIXME
-            } else if (opcode == 0x43) {
-                loader_.loadUint32(); // FIXME
-            } else if (opcode == 0x44) {
-                loader_.loadUint64(); // FIXME
-            } else if (opcode == 0x23) {
-                uint32_t global_index = loader_.loadVarUint32(); // FIXME
-            } else if (opcode == 0x0b) {
-                break;
-            } else {
-                DEV_ASSERT(false, "Invalid opcode in global section");
-            }
-        }
+        GlobalEntry* global_entry = new GlobalEntry(content_type, mutability, loadInitExpr());
+        global_section_->addGlobalVariable(global_entry);
     }
     return true;
 }
@@ -221,24 +206,7 @@ bool SectionsV1::loadElementSection() {
     uint32_t element_count = loader_.loadVarUint32();
     for (uint32_t entry = 0; entry < element_count; entry++) {
         uint32_t index = loader_.loadVarUint32();
-        while (true) {
-            uint8_t opcode = loader_.loadOpcode();
-            if (opcode == 0x41) {
-                loader_.loadVarInt32(); // FIXME
-            } else if (opcode == 0x42) {
-                loader_.loadVarInt64(); // FIXME
-            } else if (opcode == 0x43) {
-                loader_.loadUint32(); // FIXME
-            } else if (opcode == 0x44) {
-                loader_.loadUint64(); // FIXME
-            } else if (opcode == 0x23) {
-                uint32_t global_index = loader_.loadVarUint32(); // FIXME
-            } else if (opcode == 0x0b) {
-                break;
-            } else {
-                DEV_ASSERT(false, "Invalid opcode in global section");
-            }
-        }
+        InitExpr* offset = loadInitExpr();
         uint32_t num_elem = loader_.loadVarUint32();
         for (uint32_t elem_entry = 0; elem_entry < num_elem; elem_entry++) {
             uint32_t elem = loader_.loadVarUint32();
@@ -333,4 +301,39 @@ bool SectionsV1::loadDataSection() {
         loader_.loadBytes(data, size);
     }
     return true;
+}
+
+InitExpr* SectionsV1::loadInitExpr() {
+    InitExpr* init = new InitExpr();
+    while (true) {
+        Instruction* inst;
+        uint8_t opcode = loader_.loadOpcode();
+        switch (opcode) {
+        case I32ConstOpcode:
+            inst = new I32Const(loader_.loadVarInt32());
+            break;
+        case I64ConstOpcode:
+            inst = new I64Const(loader_.loadVarInt64());
+            break;
+        case F32ConstOpcode:
+            inst = new F32Const(loader_.loadUint32());
+            break;
+        case F64ConstOpcode:
+            inst = new F64Const(loader_.loadUint64());
+            break;
+        case GetGlobalOpcode:
+            inst = new GetGlobal(loader_.loadVarUint32());
+            break;
+        case EndOpcode:
+            inst = new End();
+            break;
+        default:
+            DEV_ASSERT(false, "Invalid opcode in global section");
+        }
+        init->addInstruction(inst);
+        if (opcode == EndOpcode) {
+            break;
+        }
+    }
+    return init;
 }
