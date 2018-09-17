@@ -9,6 +9,7 @@
 #include "global_section.h"
 #include "export_section.h"
 #include "element_section.h"
+#include "code_section.h"
 #include "data_section.h"
 #include "section.h"
 
@@ -37,6 +38,7 @@ private:
     GlobalSection* global_section_;
     ExportSection* export_section_;
     ElementSection* element_section_;
+    CodeSection* code_section_;
     DataSection* data_section_;
 };
 #endif // SECTION_V1_H

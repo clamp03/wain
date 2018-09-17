@@ -13,6 +13,7 @@ SET (SRC_SECTION
     global_section.cpp
     export_section.cpp
     element_section.cpp
+    code_section.cpp
     data_section.cpp
 )
 

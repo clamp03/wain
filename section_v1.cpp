@@ -3,12 +3,15 @@
 #include "instruction.h"
 
 SectionsV1::SectionsV1(Loader& l)
-    : loader_(l)
-    , type_section_(nullptr)
-    , import_section_(nullptr)
-    , function_section_(nullptr)
-    , global_section_(nullptr)
-    , export_section_(nullptr) {
+        : loader_(l)
+        , type_section_(nullptr)
+        , import_section_(nullptr)
+        , function_section_(nullptr)
+        , global_section_(nullptr)
+        , export_section_(nullptr)
+        , element_section_(nullptr)
+        , code_section_(nullptr)
+        , data_section_(nullptr) {
 }
 
 SectionsV1::~SectionsV1() {
@@ -222,55 +225,171 @@ bool SectionsV1::loadElementSection() {
 
 bool SectionsV1::loadCodeSection() {
     PayloadChecker checker(loader_);
+
+    code_section_ = new CodeSection();
+
     uint32_t code_count = loader_.loadVarUint32();
     for (uint32_t entry = 0; entry < code_count; entry++) {
         PayloadChecker bodychecker(loader_);
+
+        FunctionBody* body = new FunctionBody();
         uint32_t local_count = loader_.loadVarUint32();
         for (uint32_t local_entry = 0; local_entry < local_count; local_entry++) {
             uint32_t local_entry_count = loader_.loadVarUint32();
             int8_t value_type = loader_.loadVarInt7();
+            body->addLocal(local_entry_count, value_type);
         }
 
         uint8_t opcode;
         uint32_t idx = 0;
         uint32_t block = 1;
         do {
+            Instruction* inst;
             opcode = loader_.loadOpcode();
-            if (opcode >= 0x02 && opcode <= 0x04) {
-                int8_t block_type = loader_.loadVarInt7();
+            switch (opcode) {
+            case BlockOpcode:
+                inst = new Block(loader_.loadVarInt7());
                 block++;
-            } else if (opcode >= 0x0c && opcode <= 0x0d) {
-                uint32_t relative_depth = loader_.loadVarUint32();
-            } else if (opcode == 0x0b) {
+                break;
+            case LoopOpcode:
+                inst = new Loop(loader_.loadVarInt7());
+                block++;
+                break;
+            case IfOpcode:
+                inst = new If(loader_.loadVarInt7());
+                block++;
+                break;
+            case EndOpcode:
                 block--;
-            } else if (opcode == 0x0e) {
+                inst = new End();
+                break;
+            case BrOpcode:
+                inst = new Br(loader_.loadVarUint32());
+                break;
+            case BrIfOpcode:
+                inst = new BrIf(loader_.loadVarUint32());
+                break;
+            case BrTableOpcode: {
+                BrTable* brTable = new BrTable();
                 uint32_t target_count = loader_.loadVarUint32();
                 for (uint32_t target_entry = 0; target_entry < target_count; target_entry++) {
-                    uint32_t target_table = loader_.loadVarUint32();
+                    brTable->addTargetTable(loader_.loadVarUint32());
                 }
-                uint32_t default_target = loader_.loadVarUint32();
-            } else if (opcode == 0x10) {
-                uint32_t function_index = loader_.loadVarUint32();
-            } else if (opcode == 0x11) {
-                uint32_t type_index = loader_.loadVarUint32();
-                int8_t reserved = loader_.loadVarUint1();
-            } else if (opcode >= 0x20 && opcode <= 0x24) {
-                uint32_t index = loader_.loadVarUint32();
-            } else if (opcode >= 0x28 && opcode <= 0x3e) {
-                uint32_t flags = loader_.loadVarUint32();
-                uint32_t offset = loader_.loadVarUint32();
-            } else if (opcode >= 0x3f && opcode <= 0x40) {
-                uint8_t reserved = loader_.loadVarUint1();
-            } else if (opcode == 0x41) {
-                int32_t value = loader_.loadVarInt32();
-            } else if (opcode == 0x42) {
-                int64_t value = loader_.loadVarInt64();
-            } else if (opcode == 0x43) {
-                uint32_t value = loader_.loadUint32();
-            } else if (opcode == 0x44) {
-                uint64_t value = loader_.loadUint64();
+                brTable->setDefaultTarget(loader_.loadVarUint32());
+                inst = brTable;
+                break;
+            }
+            case CallOpcode:
+                inst = new Call(loader_.loadVarUint32());
+                break;
+            case CallIndirectOpcode:
+                inst = new CallIndirect(loader_.loadVarUint32(), loader_.loadVarUint1());
+                break;
+            case GetLocalOpcode:
+                inst = new GetLocal(loader_.loadVarUint32());
+                break;
+            case SetLocalOpcode:
+                inst = new SetLocal(loader_.loadVarUint32());
+                break;
+            case TeeLocalOpcode:
+                inst = new TeeLocal(loader_.loadVarUint32());
+                break;
+            case GetGlobalOpcode:
+                inst = new GetGlobal(loader_.loadVarUint32());
+                break;
+            case SetGlobalOpcode:
+                inst = new SetGlobal(loader_.loadVarUint32());
+                break;
+            case I32LoadOpcode:
+                inst = new I32Load(loader_.loadVarUint32(), loader_.loadVarUint32());
+                break;
+            case I64LoadOpcode:
+                inst = new I64Load(loader_.loadVarUint32(), loader_.loadVarUint32());
+                break;
+            case F32LoadOpcode:
+                inst = new F32Load(loader_.loadVarUint32(), loader_.loadVarUint32());
+                break;
+            case F64LoadOpcode:
+                inst = new F64Load(loader_.loadVarUint32(), loader_.loadVarUint32());
+                break;
+            case I32Load8SOpcode:
+                inst = new I32Load8S(loader_.loadVarUint32(), loader_.loadVarUint32());
+                break;
+            case I32Load8UOpcode:
+                inst = new I32Load8U(loader_.loadVarUint32(), loader_.loadVarUint32());
+                break;
+            case I32Load16SOpcode:
+                inst = new I32Load16S(loader_.loadVarUint32(), loader_.loadVarUint32());
+                break;
+            case I32Load16UOpcode:
+                inst = new I32Load16U(loader_.loadVarUint32(), loader_.loadVarUint32());
+                break;
+            case I64Load8SOpcode:
+                inst = new I64Load8S(loader_.loadVarUint32(), loader_.loadVarUint32());
+                break;
+            case I64Load8UOpcode:
+                inst = new I64Load8U(loader_.loadVarUint32(), loader_.loadVarUint32());
+                break;
+            case I64Load16SOpcode:
+                inst = new I64Load16S(loader_.loadVarUint32(), loader_.loadVarUint32());
+                break;
+            case I64Load16UOpcode:
+                inst = new I64Load16U(loader_.loadVarUint32(), loader_.loadVarUint32());
+                break;
+            case I64Load32SOpcode:
+                inst = new I64Load32S(loader_.loadVarUint32(), loader_.loadVarUint32());
+                break;
+            case I64Load32UOpcode:
+                inst = new I64Load32U(loader_.loadVarUint32(), loader_.loadVarUint32());
+                break;
+            case I32StoreOpcode:
+                inst = new I32Store(loader_.loadVarUint32(), loader_.loadVarUint32());
+                break;
+            case I64StoreOpcode:
+                inst = new I64Store(loader_.loadVarUint32(), loader_.loadVarUint32());
+                break;
+            case F32StoreOpcode:
+                inst = new F32Store(loader_.loadVarUint32(), loader_.loadVarUint32());
+                break;
+            case F64StoreOpcode:
+                inst = new F64Store(loader_.loadVarUint32(), loader_.loadVarUint32());
+                break;
+            case I32Store8Opcode:
+                inst = new I32Store8(loader_.loadVarUint32(), loader_.loadVarUint32());
+                break;
+            case I32Store16Opcode:
+                inst = new I32Store16(loader_.loadVarUint32(), loader_.loadVarUint32());
+                break;
+            case I64Store8Opcode:
+                inst = new I64Store8(loader_.loadVarUint32(), loader_.loadVarUint32());
+                break;
+            case I64Store16Opcode:
+                inst = new I64Store16(loader_.loadVarUint32(), loader_.loadVarUint32());
+                break;
+            case I64Store32Opcode:
+                inst = new I64Store32(loader_.loadVarUint32(), loader_.loadVarUint32());
+                break;
+            case CurrentMemoryOpcode:
+                inst = new CurrentMemory(loader_.loadVarUint1());
+                break;
+            case GrowMemoryOpcode:
+                inst = new GrowMemory(loader_.loadVarUint1());
+                break;
+            case I32ConstOpcode:
+                inst = new I32Const(loader_.loadVarInt32());
+                break;
+            case I64ConstOpcode:
+                inst = new I64Const(loader_.loadVarInt64());
+                break;
+            case F32ConstOpcode:
+                inst = new F32Const(loader_.loadUint32());
+                break;
+            case F64ConstOpcode:
+                inst = new F32Const(loader_.loadUint64());
+                break;
             }
 
+            body->addInstruction(inst);
         } while (block != 0 || opcode != 0xb);
     }
 
