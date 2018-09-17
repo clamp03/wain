@@ -3,7 +3,7 @@
 
 #include <vector>
 
-#include "init.h"
+#include "init_expr.h"
 #include "type.h"
 
 class GlobalEntry {

@@ -1,5 +1,5 @@
 #include "common.h"
-#include "init.h"
+#include "init_expr.h"
 
 InitExpr::InitExpr() {
 }
@@ -7,5 +7,3 @@ InitExpr::InitExpr() {
 void InitExpr::addInstruction(Instruction* inst) {
     instructions_.emplace_back(inst);
 }
-
-#include "type.h"

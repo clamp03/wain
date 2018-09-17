@@ -3,26 +3,26 @@ PROJECT ("WASM-INTERPRETER")
 
 SET (TARGET "wasmIntrp")
 SET (SRC_SECTION
-    section.cpp
-    section_v1.cpp
-    instruction.cpp
-    init.cpp
-    type_section.cpp
-    import_section.cpp
-    function_section.cpp
-    global_section.cpp
-    export_section.cpp
-    element_section.cpp
-    code_section.cpp
-    data_section.cpp
+    src/section/section.cpp
+    src/section/section_v1.cpp
+    src/section/instruction.cpp
+    src/section/init_expr.cpp
+    src/section/type_section.cpp
+    src/section/import_section.cpp
+    src/section/function_section.cpp
+    src/section/global_section.cpp
+    src/section/export_section.cpp
+    src/section/element_section.cpp
+    src/section/code_section.cpp
+    src/section/data_section.cpp
 )
 
 SET (SRC_FILES
-    main.cpp
-    memory.cpp
-    loader.cpp
-    type.cpp
-    module.cpp
+    src/main.cpp
+    src/loader/loader.cpp
+    src/memory/memory.cpp
+    src/type.cpp
+    src/module.cpp
     ${SRC_SECTION}
 )
 
@@ -30,3 +30,4 @@ ADD_EXECUTABLE (${TARGET} ${SRC_FILES})
 SET_TARGET_PROPERTIES(${TARGET} PROPERTIES
     COMPILE_FLAGS "-std=c++11 -g"
 )
+TARGET_INCLUDE_DIRECTORIES(${TARGET} PRIVATE src/ src/loader src/memory src/section)
