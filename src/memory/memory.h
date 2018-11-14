@@ -22,4 +22,6 @@ private:
     BufNode* curr_;
 };
 
+#define AllocateClassInstance(mem, cl) mem.allocate(sizeof(cl))
+
 #endif // MEM_H

@@ -10,6 +10,12 @@ Module::Module()
       sections_(nullptr) {
 }
 
+Module::~Module() {
+    if (sections_) {
+        free(sections_);
+    }
+}
+
 
 bool Module::loadFile(const char* fname) {
     FILE* fp = fopen(fname, "rb");

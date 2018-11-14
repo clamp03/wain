@@ -103,10 +103,10 @@ private:
 bool SectionsV1::loadTypeSection() {
     PayloadChecker checker(loader_);
 
-    type_section_ = new TypeSection();
+    type_section_ = new(AllocateClassInstance(mem_, TypeSection)) TypeSection();
     uint32_t type_count = loader_.loadVarUint32();
     for (uint32_t entry = 0; entry < type_count; entry++) {
-        FuncType* func = new FuncType();
+        FuncType* func = new(AllocateClassInstance(mem_, FuncType)) FuncType();
         int8_t form = loader_.loadVarInt7();
         func->setForm(form);
 
@@ -128,7 +128,7 @@ bool SectionsV1::loadTypeSection() {
 bool SectionsV1::loadImportSection() {
     PayloadChecker checker(loader_);
 
-    import_section_ = new ImportSection();
+    import_section_ = new(AllocateClassInstance(mem_, ImportSection)) ImportSection();
     uint32_t import_count = loader_.loadVarUint32();
     for (uint32_t entry = 0; entry < import_count; entry++) {
         uint32_t module_len = loader_.loadVarUint32();
@@ -142,20 +142,20 @@ bool SectionsV1::loadImportSection() {
         ImportType* import_type;
         if (kind == ExternalKind::Function) {
             uint32_t type = loader_.loadVarUint32();
-            import_type = new ImportTypeFunction(type);
+            import_type = new(AllocateClassInstance(mem_, ImportTypeFunction)) ImportTypeFunction(type);
         } else if (kind == ExternalKind::Table) {
             int8_t element_type = loader_.loadVarInt7();
-            import_type = new ImportTypeTable(element_type, loader_.loadResizableLimits()); // TODO: Check memory for ResizableLimits reference passing
+            import_type = new(AllocateClassInstance(mem_, ImportTypeTable)) ImportTypeTable(element_type, loader_.loadResizableLimits());
         } else if (kind == ExternalKind::Memory) {
-            import_type = new ImportTypeMemory(loader_.loadResizableLimits()); // TODO: Check memory for ResizableLimits reference passing
+            import_type = new(AllocateClassInstance(mem_, ImportTypeMemory)) ImportTypeMemory(loader_.loadResizableLimits());
         } else if (kind == ExternalKind::Global) {
             int8_t content_type = loader_.loadVarInt7();
             uint8_t mutability = loader_.loadVarUint1();
-            import_type = new ImportTypeGlobal(content_type, mutability);
+            import_type = new(AllocateClassInstance(mem_, ImportTypeGlobal)) ImportTypeGlobal(content_type, mutability);
         } else {
             DEV_ASSERT(false, "INVALID EXTERNAL KIND");
         }
-        ImportEntry* import_entry = new ImportEntry(module_len, module_str, field_len, field_str, import_type);
+        ImportEntry* import_entry = new(AllocateClassInstance(mem_, ImportEntry)) ImportEntry(module_len, module_str, field_len, field_str, import_type);
         import_section_->addImportEntry(import_entry);
     }
     return true;
@@ -164,7 +164,7 @@ bool SectionsV1::loadImportSection() {
 bool SectionsV1::loadFunctionSection() {
     PayloadChecker checker(loader_);
     uint32_t function_count = loader_.loadVarUint32();
-    function_section_ = new FunctionSection();
+    function_section_ = new(AllocateClassInstance(mem_, FunctionSection)) FunctionSection();
     for (uint32_t entry = 0; entry < function_count; entry++) {
         uint32_t type = loader_.loadVarUint32();
         function_section_->addFuncType(type);
@@ -174,13 +174,13 @@ bool SectionsV1::loadFunctionSection() {
 
 bool SectionsV1::loadGlobalSection() {
     PayloadChecker checker(loader_);
-    global_section_ = new GlobalSection();
+    global_section_ = new(AllocateClassInstance(mem_, GlobalSection)) GlobalSection();
     uint32_t global_count = loader_.loadVarUint32();
     for (uint32_t entry = 0; entry < global_count; entry++) {
         // global_type
         int8_t content_type = loader_.loadVarInt7();
         uint8_t mutability = loader_.loadVarUint1();
-        GlobalEntry* global_entry = new GlobalEntry(content_type, mutability, loadInitExpr());
+        GlobalEntry* global_entry = new(AllocateClassInstance(mem_, GlobalEntry)) GlobalEntry(content_type, mutability, loadInitExpr());
         global_section_->addGlobalVariable(global_entry);
     }
     return true;
@@ -189,7 +189,7 @@ bool SectionsV1::loadGlobalSection() {
 bool SectionsV1::loadExportSection() {
     PayloadChecker checker(loader_);
 
-    export_section_ = new ExportSection();
+    export_section_ = new(AllocateClassInstance(mem_, ExportSection)) ExportSection();
     uint32_t export_count = loader_.loadVarUint32();
     for (uint32_t entry = 0; entry < export_count; entry++) {
         uint32_t field_len = loader_.loadVarUint32();
@@ -197,7 +197,7 @@ bool SectionsV1::loadExportSection() {
         loader_.loadBytes(field_str, field_len);
         ExternalKind kind = static_cast<ExternalKind>(loader_.loadVarUint7());
         uint32_t index = loader_.loadVarUint32();
-        ExportEntry* export_entry = new ExportEntry(field_len, field_str, kind, index);
+        ExportEntry* export_entry = new(AllocateClassInstance(mem_, ExportEntry)) ExportEntry(field_len, field_str, kind, index);
         export_section_->addExportEntry(export_entry);
     }
 
@@ -207,12 +207,12 @@ bool SectionsV1::loadExportSection() {
 bool SectionsV1::loadElementSection() {
     PayloadChecker checker(loader_);
 
-    element_section_ = new ElementSection();
+    element_section_ = new(AllocateClassInstance(mem_, ElementSection)) ElementSection();
     uint32_t element_count = loader_.loadVarUint32();
     for (uint32_t entry = 0; entry < element_count; entry++) {
         uint32_t index = loader_.loadVarUint32();
         InitExpr* offset = loadInitExpr();
-        ElementSegment* segment = new ElementSegment(index, offset);
+        ElementSegment* segment = new(AllocateClassInstance(mem_, ElementSegment)) ElementSegment(index, offset);
         uint32_t num_elem = loader_.loadVarUint32();
         for (uint32_t elem_entry = 0; elem_entry < num_elem; elem_entry++) {
             uint32_t elem = loader_.loadVarUint32();
@@ -226,18 +226,19 @@ bool SectionsV1::loadElementSection() {
 bool SectionsV1::loadCodeSection() {
     PayloadChecker checker(loader_);
 
-    code_section_ = new CodeSection();
+    code_section_ = new(AllocateClassInstance(mem_, CodeSection)) CodeSection();
 
     uint32_t code_count = loader_.loadVarUint32();
     for (uint32_t entry = 0; entry < code_count; entry++) {
         PayloadChecker bodychecker(loader_);
 
-        FunctionBody* body = new FunctionBody();
+        FunctionBody* body = new(AllocateClassInstance(mem_, FunctionBody)) FunctionBody();
         uint32_t local_count = loader_.loadVarUint32();
         for (uint32_t local_entry = 0; local_entry < local_count; local_entry++) {
             uint32_t local_entry_count = loader_.loadVarUint32();
             int8_t value_type = loader_.loadVarInt7();
-            body->addLocal(local_entry_count, value_type);
+            Local* local = new(AllocateClassInstance(mem_, Local)) Local(local_entry_count, value_type);
+            body->addLocal(local);
         }
 
         uint8_t opcode;
@@ -248,29 +249,29 @@ bool SectionsV1::loadCodeSection() {
             opcode = loader_.loadOpcode();
             switch (opcode) {
             case BlockOpcode:
-                inst = new Block(loader_.loadVarInt7());
+                inst = new(AllocateClassInstance(mem_, Block)) Block(loader_.loadVarInt7());
                 block++;
                 break;
             case LoopOpcode:
-                inst = new Loop(loader_.loadVarInt7());
+                inst = new(AllocateClassInstance(mem_, Loop)) Loop(loader_.loadVarInt7());
                 block++;
                 break;
             case IfOpcode:
-                inst = new If(loader_.loadVarInt7());
+                inst = new(AllocateClassInstance(mem_, If)) If(loader_.loadVarInt7());
                 block++;
                 break;
             case EndOpcode:
                 block--;
-                inst = new End();
+                inst = new(AllocateClassInstance(mem_, End)) End();
                 break;
             case BrOpcode:
-                inst = new Br(loader_.loadVarUint32());
+                inst = new(AllocateClassInstance(mem_, Br)) Br(loader_.loadVarUint32());
                 break;
             case BrIfOpcode:
-                inst = new BrIf(loader_.loadVarUint32());
+                inst = new(AllocateClassInstance(mem_, BrIf)) BrIf(loader_.loadVarUint32());
                 break;
             case BrTableOpcode: {
-                BrTable* brTable = new BrTable();
+                BrTable* brTable = new(AllocateClassInstance(mem_, BrTable)) BrTable();
                 uint32_t target_count = loader_.loadVarUint32();
                 for (uint32_t target_entry = 0; target_entry < target_count; target_entry++) {
                     brTable->addTargetTable(loader_.loadVarUint32());
@@ -280,112 +281,112 @@ bool SectionsV1::loadCodeSection() {
                 break;
             }
             case CallOpcode:
-                inst = new Call(loader_.loadVarUint32());
+                inst = new(AllocateClassInstance(mem_, Call)) Call(loader_.loadVarUint32());
                 break;
             case CallIndirectOpcode:
-                inst = new CallIndirect(loader_.loadVarUint32(), loader_.loadVarUint1());
+                inst = new(AllocateClassInstance(mem_, CallIndirect)) CallIndirect(loader_.loadVarUint32(), loader_.loadVarUint1());
                 break;
             case GetLocalOpcode:
-                inst = new GetLocal(loader_.loadVarUint32());
+                inst = new(AllocateClassInstance(mem_, GetLocal)) GetLocal(loader_.loadVarUint32());
                 break;
             case SetLocalOpcode:
-                inst = new SetLocal(loader_.loadVarUint32());
+                inst = new(AllocateClassInstance(mem_, SetLocal)) SetLocal(loader_.loadVarUint32());
                 break;
             case TeeLocalOpcode:
-                inst = new TeeLocal(loader_.loadVarUint32());
+                inst = new(AllocateClassInstance(mem_, TeeLocal)) TeeLocal(loader_.loadVarUint32());
                 break;
             case GetGlobalOpcode:
-                inst = new GetGlobal(loader_.loadVarUint32());
+                inst = new(AllocateClassInstance(mem_, GetGlobal)) GetGlobal(loader_.loadVarUint32());
                 break;
             case SetGlobalOpcode:
-                inst = new SetGlobal(loader_.loadVarUint32());
+                inst = new(AllocateClassInstance(mem_, SetGlobal)) SetGlobal(loader_.loadVarUint32());
                 break;
             case I32LoadOpcode:
-                inst = new I32Load(loader_.loadVarUint32(), loader_.loadVarUint32());
+                inst = new(AllocateClassInstance(mem_, I32Load)) I32Load(loader_.loadVarUint32(), loader_.loadVarUint32());
                 break;
             case I64LoadOpcode:
-                inst = new I64Load(loader_.loadVarUint32(), loader_.loadVarUint32());
+                inst = new(AllocateClassInstance(mem_, I64Load)) I64Load(loader_.loadVarUint32(), loader_.loadVarUint32());
                 break;
             case F32LoadOpcode:
-                inst = new F32Load(loader_.loadVarUint32(), loader_.loadVarUint32());
+                inst = new(AllocateClassInstance(mem_, F32Load)) F32Load(loader_.loadVarUint32(), loader_.loadVarUint32());
                 break;
             case F64LoadOpcode:
-                inst = new F64Load(loader_.loadVarUint32(), loader_.loadVarUint32());
+                inst = new(AllocateClassInstance(mem_, F64Load)) F64Load(loader_.loadVarUint32(), loader_.loadVarUint32());
                 break;
             case I32Load8SOpcode:
-                inst = new I32Load8S(loader_.loadVarUint32(), loader_.loadVarUint32());
+                inst = new(AllocateClassInstance(mem_, I32Load8S)) I32Load8S(loader_.loadVarUint32(), loader_.loadVarUint32());
                 break;
             case I32Load8UOpcode:
-                inst = new I32Load8U(loader_.loadVarUint32(), loader_.loadVarUint32());
+                inst = new(AllocateClassInstance(mem_, I32Load8U)) I32Load8U(loader_.loadVarUint32(), loader_.loadVarUint32());
                 break;
             case I32Load16SOpcode:
-                inst = new I32Load16S(loader_.loadVarUint32(), loader_.loadVarUint32());
+                inst = new(AllocateClassInstance(mem_, I32Load16S)) I32Load16S(loader_.loadVarUint32(), loader_.loadVarUint32());
                 break;
             case I32Load16UOpcode:
-                inst = new I32Load16U(loader_.loadVarUint32(), loader_.loadVarUint32());
+                inst = new(AllocateClassInstance(mem_, I32Load16U)) I32Load16U(loader_.loadVarUint32(), loader_.loadVarUint32());
                 break;
             case I64Load8SOpcode:
-                inst = new I64Load8S(loader_.loadVarUint32(), loader_.loadVarUint32());
+                inst = new(AllocateClassInstance(mem_, I64Load8S)) I64Load8S(loader_.loadVarUint32(), loader_.loadVarUint32());
                 break;
             case I64Load8UOpcode:
-                inst = new I64Load8U(loader_.loadVarUint32(), loader_.loadVarUint32());
+                inst = new(AllocateClassInstance(mem_, I64Load8U)) I64Load8U(loader_.loadVarUint32(), loader_.loadVarUint32());
                 break;
             case I64Load16SOpcode:
-                inst = new I64Load16S(loader_.loadVarUint32(), loader_.loadVarUint32());
+                inst = new(AllocateClassInstance(mem_, I64Load16S)) I64Load16S(loader_.loadVarUint32(), loader_.loadVarUint32());
                 break;
             case I64Load16UOpcode:
-                inst = new I64Load16U(loader_.loadVarUint32(), loader_.loadVarUint32());
+                inst = new(AllocateClassInstance(mem_, I64Load16U)) I64Load16U(loader_.loadVarUint32(), loader_.loadVarUint32());
                 break;
             case I64Load32SOpcode:
-                inst = new I64Load32S(loader_.loadVarUint32(), loader_.loadVarUint32());
+                inst = new(AllocateClassInstance(mem_, I64Load32S)) I64Load32S(loader_.loadVarUint32(), loader_.loadVarUint32());
                 break;
             case I64Load32UOpcode:
-                inst = new I64Load32U(loader_.loadVarUint32(), loader_.loadVarUint32());
+                inst = new(AllocateClassInstance(mem_, I64Load32U)) I64Load32U(loader_.loadVarUint32(), loader_.loadVarUint32());
                 break;
             case I32StoreOpcode:
-                inst = new I32Store(loader_.loadVarUint32(), loader_.loadVarUint32());
+                inst = new(AllocateClassInstance(mem_, I32Store)) I32Store(loader_.loadVarUint32(), loader_.loadVarUint32());
                 break;
             case I64StoreOpcode:
-                inst = new I64Store(loader_.loadVarUint32(), loader_.loadVarUint32());
+                inst = new(AllocateClassInstance(mem_, I64Store)) I64Store(loader_.loadVarUint32(), loader_.loadVarUint32());
                 break;
             case F32StoreOpcode:
-                inst = new F32Store(loader_.loadVarUint32(), loader_.loadVarUint32());
+                inst = new(AllocateClassInstance(mem_, F32Store)) F32Store(loader_.loadVarUint32(), loader_.loadVarUint32());
                 break;
             case F64StoreOpcode:
-                inst = new F64Store(loader_.loadVarUint32(), loader_.loadVarUint32());
+                inst = new(AllocateClassInstance(mem_, F64Store)) F64Store(loader_.loadVarUint32(), loader_.loadVarUint32());
                 break;
             case I32Store8Opcode:
-                inst = new I32Store8(loader_.loadVarUint32(), loader_.loadVarUint32());
+                inst = new(AllocateClassInstance(mem_, I32Store8)) I32Store8(loader_.loadVarUint32(), loader_.loadVarUint32());
                 break;
             case I32Store16Opcode:
-                inst = new I32Store16(loader_.loadVarUint32(), loader_.loadVarUint32());
+                inst = new(AllocateClassInstance(mem_, I32Store16)) I32Store16(loader_.loadVarUint32(), loader_.loadVarUint32());
                 break;
             case I64Store8Opcode:
-                inst = new I64Store8(loader_.loadVarUint32(), loader_.loadVarUint32());
+                inst = new(AllocateClassInstance(mem_, I64Store8)) I64Store8(loader_.loadVarUint32(), loader_.loadVarUint32());
                 break;
             case I64Store16Opcode:
-                inst = new I64Store16(loader_.loadVarUint32(), loader_.loadVarUint32());
+                inst = new(AllocateClassInstance(mem_, I64Store16)) I64Store16(loader_.loadVarUint32(), loader_.loadVarUint32());
                 break;
             case I64Store32Opcode:
-                inst = new I64Store32(loader_.loadVarUint32(), loader_.loadVarUint32());
+                inst = new(AllocateClassInstance(mem_, I64Store32)) I64Store32(loader_.loadVarUint32(), loader_.loadVarUint32());
                 break;
             case CurrentMemoryOpcode:
-                inst = new CurrentMemory(loader_.loadVarUint1());
+                inst = new(AllocateClassInstance(mem_, CurrentMemory)) CurrentMemory(loader_.loadVarUint1());
                 break;
             case GrowMemoryOpcode:
-                inst = new GrowMemory(loader_.loadVarUint1());
+                inst = new(AllocateClassInstance(mem_, GrowMemory)) GrowMemory(loader_.loadVarUint1());
                 break;
             case I32ConstOpcode:
-                inst = new I32Const(loader_.loadVarInt32());
+                inst = new(AllocateClassInstance(mem_, I32Const)) I32Const(loader_.loadVarInt32());
                 break;
             case I64ConstOpcode:
-                inst = new I64Const(loader_.loadVarInt64());
+                inst = new(AllocateClassInstance(mem_, I64Const)) I64Const(loader_.loadVarInt64());
                 break;
             case F32ConstOpcode:
-                inst = new F32Const(loader_.loadUint32());
+                inst = new(AllocateClassInstance(mem_, F32Const)) F32Const(loader_.loadUint32());
                 break;
             case F64ConstOpcode:
-                inst = new F32Const(loader_.loadUint64());
+                inst = new(AllocateClassInstance(mem_, F32Const)) F32Const(loader_.loadUint64());
                 break;
             }
 
@@ -399,7 +400,7 @@ bool SectionsV1::loadCodeSection() {
 bool SectionsV1::loadDataSection() {
     PayloadChecker checker(loader_);
 
-    data_section_ = new DataSection();
+    data_section_ = new(AllocateClassInstance(mem_, DataSection)) DataSection();
 
     uint32_t count = loader_.loadVarUint32();
     for (uint32_t entry = 0; entry < count; entry++) {
@@ -408,35 +409,35 @@ bool SectionsV1::loadDataSection() {
         uint32_t size = loader_.loadVarUint32();
         uint8_t* data = static_cast<uint8_t*>(mem_.allocate(size));
         loader_.loadBytes(data, size);
-        DataSegment* segment = new DataSegment(index, offset, size, data);
+        DataSegment* segment = new(AllocateClassInstance(mem_, DataSegment)) DataSegment(index, offset, size, data);
         data_section_->addDataSegment(segment);
     }
     return true;
 }
 
 InitExpr* SectionsV1::loadInitExpr() {
-    InitExpr* init = new InitExpr();
+    InitExpr* init = new(AllocateClassInstance(mem_, InitExpr)) InitExpr();
     while (true) {
         Instruction* inst;
         uint8_t opcode = loader_.loadOpcode();
         switch (opcode) {
         case I32ConstOpcode:
-            inst = new I32Const(loader_.loadVarInt32());
+            inst = new(AllocateClassInstance(mem_, I32Const)) I32Const(loader_.loadVarInt32());
             break;
         case I64ConstOpcode:
-            inst = new I64Const(loader_.loadVarInt64());
+            inst = new(AllocateClassInstance(mem_, I64Const)) I64Const(loader_.loadVarInt64());
             break;
         case F32ConstOpcode:
-            inst = new F32Const(loader_.loadUint32());
+            inst = new(AllocateClassInstance(mem_, F32Const)) F32Const(loader_.loadUint32());
             break;
         case F64ConstOpcode:
-            inst = new F64Const(loader_.loadUint64());
+            inst = new(AllocateClassInstance(mem_, F64Const)) F64Const(loader_.loadUint64());
             break;
         case GetGlobalOpcode:
-            inst = new GetGlobal(loader_.loadVarUint32());
+            inst = new(AllocateClassInstance(mem_, GetGlobal)) GetGlobal(loader_.loadVarUint32());
             break;
         case EndOpcode:
-            inst = new End();
+            inst = new(AllocateClassInstance(mem_, End)) End();
             break;
         default:
             DEV_ASSERT(false, "Invalid opcode in global section");

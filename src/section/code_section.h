@@ -16,7 +16,7 @@ private:
 
 class FunctionBody {
 public:
-    void addLocal(uint32_t count, int8_t type);
+    void addLocal(Local* local);
     void addInstruction(Instruction* inst);
 
     uint32_t localCount();

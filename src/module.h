@@ -9,6 +9,7 @@ class Sections;
 class Module {
 public:
     Module();
+    virtual ~Module();
 
     bool loadFile(const char* fname);
     bool load(const uint8_t* buf, size_t size);

@@ -5,8 +5,7 @@ Local::Local(uint32_t count, int8_t type)
         , type_(type) {
 }
 
-void FunctionBody::addLocal(uint32_t count, int8_t type) {
-    Local* local = new Local(count, type);
+void FunctionBody::addLocal(Local* local) {
     locals_.emplace_back(local);
 }
 
