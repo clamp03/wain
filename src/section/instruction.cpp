@@ -1,7 +1,9 @@
 #include "instruction.h"
 
 #define DEFINE_OPCODE_FUNCTION(name, code) uint8_t name::opcode() const { return code; }
+#define GET_NAME_FROM_OPCODE(name, code) const char* name::opcodeName() const { return #name; }
 ENUMERATE_OPCODE(DEFINE_OPCODE_FUNCTION);
+ENUMERATE_OPCODE(GET_NAME_FROM_OPCODE);
 #undef DEFINE_OPCODE
 
 Block::Block(int8_t type)

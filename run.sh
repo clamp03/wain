@@ -1,1 +1,1 @@
-./wasmIntrp hell.wasm
+make && ./wasmIntrp hell/hell.wasm
