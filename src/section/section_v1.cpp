@@ -248,6 +248,12 @@ bool SectionsV1::loadCodeSection() {
             Instruction* inst;
             opcode = loader_.loadOpcode();
             switch (opcode) {
+            case UnreachableOpcode:
+                inst = new(AllocateClassInstance(mem_, Unreachable)) Unreachable();
+                break;
+            case NopOpcode:
+                inst = new(AllocateClassInstance(mem_, Nop)) Nop();
+                break;
             case BlockOpcode:
                 inst = new(AllocateClassInstance(mem_, Block)) Block(loader_.loadVarInt7());
                 block++;
@@ -259,6 +265,9 @@ bool SectionsV1::loadCodeSection() {
             case IfOpcode:
                 inst = new(AllocateClassInstance(mem_, If)) If(loader_.loadVarInt7());
                 block++;
+                break;
+            case ElseOpcode:
+                inst = new(AllocateClassInstance(mem_, Else)) Else();
                 break;
             case EndOpcode:
                 block--;
@@ -280,11 +289,17 @@ bool SectionsV1::loadCodeSection() {
                 inst = brTable;
                 break;
             }
+            case ReturnOpcode:
+                inst = new(AllocateClassInstance(mem_, Return)) Return();
+                break;
             case CallOpcode:
                 inst = new(AllocateClassInstance(mem_, Call)) Call(loader_.loadVarUint32());
                 break;
             case CallIndirectOpcode:
                 inst = new(AllocateClassInstance(mem_, CallIndirect)) CallIndirect(loader_.loadVarUint32(), loader_.loadVarUint1());
+                break;
+            case DropOpcode:
+                inst = new(AllocateClassInstance(mem_, Drop)) Drop();
                 break;
             case GetLocalOpcode:
                 inst = new(AllocateClassInstance(mem_, GetLocal)) GetLocal(loader_.loadVarUint32());
@@ -388,8 +403,190 @@ bool SectionsV1::loadCodeSection() {
             case F64ConstOpcode:
                 inst = new(AllocateClassInstance(mem_, F32Const)) F32Const(loader_.loadUint64());
                 break;
+            case I32EQZOpcode:
+                inst = new(AllocateClassInstance(mem_, I32EQZ)) I32EQZ();
+                break;
+            case I32EQOpcode:
+                inst = new(AllocateClassInstance(mem_, I32EQ)) I32EQ();
+                break;
+            case I32NEOpcode:
+                inst = new(AllocateClassInstance(mem_, I32NE)) I32NE();
+                break;
+            case I32LT_SOpcode:
+                inst = new(AllocateClassInstance(mem_, I32LT_S)) I32LT_S();
+            case I32LT_UOpcode:
+                inst = new(AllocateClassInstance(mem_, I32LT_U)) I32LT_U();
+                break;
+            case I32GT_SOpcode:
+                inst = new(AllocateClassInstance(mem_, I32GT_S)) I32GT_S();
+                break;
+            case I32GT_UOpcode:
+                inst = new(AllocateClassInstance(mem_, I32GT_U)) I32GT_U();
+                break;
+            case I32LE_SOpcode:
+                inst = new(AllocateClassInstance(mem_, I32LE_S)) I32LE_S();
+                break;
+            case I32LE_UOpcode:
+                inst = new(AllocateClassInstance(mem_, I32LE_U)) I32LE_U();
+                break;
+            case I32GE_SOpcode:
+                inst = new(AllocateClassInstance(mem_, I32GE_S)) I32GE_S();
+                break;
+            case I32GE_UOpcode:
+                inst = new(AllocateClassInstance(mem_, I32GE_U)) I32GE_U();
+                break;
+            case I64EQZOpcode:
+                inst = new(AllocateClassInstance(mem_, I64EQZ)) I64EQZ();
+                break;
+            case I64EQOpcode:
+                inst = new(AllocateClassInstance(mem_, I64EQ)) I64EQ();
+                break;
+            case I64NEOpcode:
+                inst = new(AllocateClassInstance(mem_, I64NE)) I64NE();
+                break;
+            case I64LT_SOpcode:
+                inst = new(AllocateClassInstance(mem_, I64LT_S)) I32LT_S();
+            case I64LT_UOpcode:
+                inst = new(AllocateClassInstance(mem_, I64LT_U)) I32LT_U();
+                break;
+            case I64GT_SOpcode:
+                inst = new(AllocateClassInstance(mem_, I64GT_S)) I32GT_S();
+                break;
+            case I64GT_UOpcode:
+                inst = new(AllocateClassInstance(mem_, I64GT_U)) I32GT_U();
+                break;
+            case I64LE_SOpcode:
+                inst = new(AllocateClassInstance(mem_, I64LE_S)) I32LE_S();
+                break;
+            case I64LE_UOpcode:
+                inst = new(AllocateClassInstance(mem_, I64LE_U)) I32LE_U();
+                break;
+            case I64GE_SOpcode:
+                inst = new(AllocateClassInstance(mem_, I64GE_S)) I32GE_S();
+                break;
+            case I64GE_UOpcode:
+                inst = new(AllocateClassInstance(mem_, I64GE_U)) I32GE_U();
+                break;
+            case F64EQOpcode:
+                inst = new(AllocateClassInstance(mem_, F64EQ)) F64EQ();
+                break;
+            case F64NEOpcode:
+                inst = new(AllocateClassInstance(mem_, F64NE)) F64NE();
+                break;
+            case I32AddOpcode:
+                inst = new(AllocateClassInstance(mem_, I32Add)) I32Add();
+                break;
+            case I32SubOpcode:
+                inst = new(AllocateClassInstance(mem_, I32Sub)) I32Sub();
+                break;
+            case I32MulOpcode:
+                inst = new(AllocateClassInstance(mem_, I32Mul)) I32Mul();
+                break;
+            case I32Div_SOpcode:
+                inst = new(AllocateClassInstance(mem_, I32Div_S)) I32Div_S();
+                break;
+            case I32Div_UOpcode:
+                inst = new(AllocateClassInstance(mem_, I32Div_U)) I32Div_U();
+                break;
+            case I32Rem_SOpcode:
+                inst = new(AllocateClassInstance(mem_, I32Rem_S)) I32Rem_S();
+                break;
+            case I32Rem_UOpcode:
+                inst = new(AllocateClassInstance(mem_, I32Rem_U)) I32Rem_U();
+                break;
+            case I32AndOpcode:
+                inst = new(AllocateClassInstance(mem_, I32And)) I32And();
+                break;
+            case I32OrOpcode:
+                inst = new(AllocateClassInstance(mem_, I32Or)) I32Or();
+                break;
+            case I32XorOpcode:
+                inst = new(AllocateClassInstance(mem_, I32Xor)) I32Xor();
+                break;
+            case I32ShlOpcode:
+                inst = new(AllocateClassInstance(mem_, I32Shl)) I32Shl();
+                break;
+            case I32Shr_SOpcode:
+                inst = new(AllocateClassInstance(mem_, I32Shr_S)) I32Shr_S();
+                break;
+            case I32Shr_UOpcode:
+                inst = new(AllocateClassInstance(mem_, I32Shr_U)) I32Shr_U();
+                break;
+            case I64AddOpcode:
+                inst = new(AllocateClassInstance(mem_, I64Add)) I64Add();
+                break;
+            case I64SubOpcode:
+                inst = new(AllocateClassInstance(mem_, I64Sub)) I64Sub();
+                break;
+            case I64MulOpcode:
+                inst = new(AllocateClassInstance(mem_, I64Mul)) I64Mul();
+                break;
+            case I64Div_SOpcode:
+                inst = new(AllocateClassInstance(mem_, I64Div_S)) I64Div_S();
+                break;
+            case I64Div_UOpcode:
+                inst = new(AllocateClassInstance(mem_, I64Div_U)) I64Div_U();
+                break;
+            case I64AndOpcode:
+                inst = new(AllocateClassInstance(mem_, I64And)) I64And();
+                break;
+            case I64OrOpcode:
+                inst = new(AllocateClassInstance(mem_, I64Or)) I64Or();
+                break;
+            case I64XorOpcode:
+                inst = new(AllocateClassInstance(mem_, I64Xor)) I64Xor();
+                break;
+            case I64ShlOpcode:
+                inst = new(AllocateClassInstance(mem_, I64Xor)) I64Shl();
+                break;
+            case I64Shr_SOpcode:
+                inst = new(AllocateClassInstance(mem_, I64Shr_S)) I64Shr_S();
+                break;
+            case I64Shr_UOpcode:
+                inst = new(AllocateClassInstance(mem_, I64Shr_U)) I64Shr_U();
+                break;
+            case F64NegOpcode:
+                inst = new(AllocateClassInstance(mem_, F64Neg)) F64Neg();
+                break;
+            case F64AddOpcode:
+                inst = new(AllocateClassInstance(mem_, F64Add)) F64Add();
+                break;
+            case F64SubOpcode:
+                inst = new(AllocateClassInstance(mem_, F64Sub)) F64Sub();
+                break;
+            case F64MulOpcode:
+                inst = new(AllocateClassInstance(mem_, F64Mul)) F64Mul();
+                break;
+            case I32Wrap_I64Opcode:
+                inst = new(AllocateClassInstance(mem_, I32Wrap_I64)) I32Wrap_I64();
+                break;
+            case I32Trunc_S_F64Opcode:
+                inst = new(AllocateClassInstance(mem_, I32Trunc_S_F64)) I32Trunc_S_F64();
+                break;
+            case I32Trunc_U_F64Opcode:
+                inst = new(AllocateClassInstance(mem_, I32Trunc_U_F64)) I32Trunc_U_F64();
+                break;
+            case I64Extend_S_I32Opcode:
+                inst = new(AllocateClassInstance(mem_, I64Extend_S_I32)) I64Extend_S_I32();
+                break;
+            case I64Extend_U_I32Opcode:
+                inst = new(AllocateClassInstance(mem_, I64Extend_U_I32)) I64Extend_U_I32();
+                break;
+            case F64Convert_S_I32Opcode:
+                inst = new(AllocateClassInstance(mem_, F64Convert_S_I32)) F64Convert_S_I32();
+                break;
+            case F64Convert_U_I32Opcode:
+                inst = new(AllocateClassInstance(mem_, F64Convert_U_I32)) F64Convert_U_I32();
+                break;
+            case I64Reinterpret_F64Opcode:
+                inst = new(AllocateClassInstance(mem_, I64Reinterpret_F64)) I64Reinterpret_F64();
+                break;
+            case F64Reinterpret_I64Opcode:
+                inst = new(AllocateClassInstance(mem_, F64Reinterpret_I64)) F64Reinterpret_I64();
+                break;
+            default:
+                NOT_YET_IMPLEMENTED
             }
-
             body->addInstruction(inst);
         } while (block != 0 || opcode != 0xb);
     }
