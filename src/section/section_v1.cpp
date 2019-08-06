@@ -42,9 +42,15 @@ bool SectionsV1::load() {
                 }
                 break;
             case SectionId::TABLE:
-                NOT_YET_IMPLEMENTED
+                if (!loadTableSection()) {
+                    DEV_ASSERT(false, "Invalid table section");
+                }
+                break;
             case SectionId::MEMORY:
-                NOT_YET_IMPLEMENTED
+                if (!loadMemorySection()) {
+                    DEV_ASSERT(false, "Invalid memory section");
+                }
+                break;
             case SectionId::GLOBAL:
                 if (!loadGlobalSection()) {
                     DEV_ASSERT(false, "Invalid global section");
@@ -168,6 +174,28 @@ bool SectionsV1::loadFunctionSection() {
     for (uint32_t entry = 0; entry < function_count; entry++) {
         uint32_t type = loader_.loadVarUint32();
         function_section_->addFuncType(type);
+    }
+    return true;
+}
+
+bool SectionsV1::loadTableSection() {
+    PayloadChecker checker(loader_);
+    uint32_t table_count = loader_.loadVarUint32();
+    table_section_ = new(AllocateClassInstance(mem_, TableSection)) TableSection();
+    for (uint32_t entry = 0; entry < table_count; entry++) {
+         TableType* table_type = new(AllocateClassInstance(mem_, TableType)) TableType(loader_.loadVarInt7(), loader_.loadResizableLimits());
+         table_section_->addTableType(table_type);
+    }
+    return true;
+}
+
+bool SectionsV1::loadMemorySection() {
+    PayloadChecker checker(loader_);
+    uint32_t memory_count = loader_.loadVarUint32();
+    memory_section_ = new(AllocateClassInstance(mem_, MemorySection)) MemorySection();
+    for (uint32_t entry = 0; entry < memory_count; entry++) {
+         MemoryType* memory_type = new(AllocateClassInstance(mem_, MemoryType)) MemoryType(loader_.loadResizableLimits());
+         memory_section_->addMemoryType(memory_type);
     }
     return true;
 }
@@ -654,6 +682,8 @@ InitExpr* SectionsV1::loadInitExpr() {
 DefineGetSectionFunc(Type, type);
 DefineGetSectionFunc(Import, import);
 DefineGetSectionFunc(Function, function);
+DefineGetSectionFunc(Table, table);
+DefineGetSectionFunc(Memory, memory);
 DefineGetSectionFunc(Global, global);
 DefineGetSectionFunc(Export, export);
 DefineGetSectionFunc(Element, element);

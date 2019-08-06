@@ -10,6 +10,8 @@ SET (SRC_SECTION
     src/section/type_section.cpp
     src/section/import_section.cpp
     src/section/function_section.cpp
+    src/section/table_section.cpp
+    src/section/memory_section.cpp
     src/section/global_section.cpp
     src/section/export_section.cpp
     src/section/element_section.cpp

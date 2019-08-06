@@ -6,6 +6,7 @@
 #include "type_section.h"
 #include "import_section.h"
 #include "function_section.h"
+#include "table_section.h"
 #include "global_section.h"
 #include "export_section.h"
 #include "element_section.h"
@@ -21,6 +22,8 @@ public:
     virtual bool loadTypeSection();
     virtual bool loadImportSection();
     virtual bool loadFunctionSection();
+    virtual bool loadTableSection();
+    virtual bool loadMemorySection();
     virtual bool loadGlobalSection();
     virtual bool loadExportSection();
     virtual bool loadElementSection();
@@ -30,6 +33,8 @@ public:
     virtual TypeSection* getTypeSection();
     virtual ImportSection* getImportSection();
     virtual FunctionSection* getFunctionSection();
+    virtual TableSection* getTableSection();
+    virtual MemorySection* getMemorySection();
     virtual GlobalSection* getGlobalSection();
     virtual ExportSection* getExportSection();
     virtual ElementSection* getElementSection();
@@ -44,6 +49,8 @@ private:
     TypeSection* type_section_;
     ImportSection* import_section_;
     FunctionSection* function_section_;
+    TableSection* table_section_;
+    MemorySection* memory_section_;
     GlobalSection* global_section_;
     ExportSection* export_section_;
     ElementSection* element_section_;
