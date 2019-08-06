@@ -1,7 +1,7 @@
 CMAKE_MINIMUM_REQUIRED (VERSION 3.5)
-PROJECT ("WASM-INTERPRETER")
+PROJECT ("WAIN")
 
-SET (TARGET "wasmIntrp")
+SET (TARGET "wain")
 SET (SRC_SECTION
     src/section/section.cpp
     src/section/section_v1.cpp
