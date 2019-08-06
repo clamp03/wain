@@ -1,4 +1,7 @@
-#include <stdio.h>
+int x2(int x) {
+    return x * 2;
+}
+
 int main() {
-  printf("Hell, world!\n");
+    return x2(1);
 }
