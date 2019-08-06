@@ -27,6 +27,15 @@ public:
     virtual bool loadCodeSection();
     virtual bool loadDataSection();
 
+    virtual TypeSection* getTypeSection();
+    virtual ImportSection* getImportSection();
+    virtual FunctionSection* getFunctionSection();
+    virtual GlobalSection* getGlobalSection();
+    virtual ExportSection* getExportSection();
+    virtual ElementSection* getElementSection();
+    virtual CodeSection* getCodeSection();
+    virtual DataSection* getDataSection();
+
 private:
     InitExpr* loadInitExpr();
 

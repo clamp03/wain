@@ -8,3 +8,8 @@ uint32_t FunctionSection::count() {
 void FunctionSection::addFuncType(uint32_t type) {
     types_.emplace_back(type);
 }
+
+uint32_t FunctionSection::type(uint32_t idx) {
+    DEV_ASSERT(idx < count(), "Invalid type index");
+    return types_[idx];
+}

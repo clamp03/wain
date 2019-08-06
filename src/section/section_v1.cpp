@@ -646,3 +646,17 @@ InitExpr* SectionsV1::loadInitExpr() {
     }
     return init;
 }
+
+#define DefineGetSectionFunc(type, field)            \
+    type##Section* SectionsV1::get##type##Section() {\
+        return field##_section_;                     \
+    }
+DefineGetSectionFunc(Type, type);
+DefineGetSectionFunc(Import, import);
+DefineGetSectionFunc(Function, function);
+DefineGetSectionFunc(Global, global);
+DefineGetSectionFunc(Export, export);
+DefineGetSectionFunc(Element, element);
+DefineGetSectionFunc(Code, code);
+DefineGetSectionFunc(Data, data);
+#undef DefineGetSectionFunc
