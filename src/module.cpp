@@ -50,7 +50,6 @@ bool Module::load(const uint8_t* buf, size_t size) {
     if (version_ == 1) {
         sections_ = new SectionsV1(l);
         sections_->load();
-        delete sections_; // FIXME
     } else {
         // Currently, there is only version 1
         return false;
