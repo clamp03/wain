@@ -3,10 +3,10 @@
 
 #include <vector>
 
-#define I32 0x7F;
-#define I64 0x7E;
-#define F32 0x7D;
-#define F64 0x7C;
+#define I32 0x7F
+#define I64 0x7E
+#define F32 0x7D
+#define F64 0x7C
 
 #define ANYFUNC 0x70
 #define FUNC 0x60
@@ -22,13 +22,13 @@ public:
     void setForm(int8_t form);
     int8_t form();
 
-    uint32_t paramCount();
+    uint32_t paramCount() const;
     void addParamType(ValueType type);
     ValueType paramType(uint32_t idx);
 
-    bool hasReturnType();
+    bool hasReturnType() const;
     void setReturnType(ValueType type);
-    ValueType returnType();
+    ValueType returnType() const;
 
 private:
     int8_t form_;

@@ -13,7 +13,7 @@ int8_t FuncType::form() {
     return form_;
 }
 
-uint32_t FuncType::paramCount() {
+uint32_t FuncType::paramCount() const {
     return param_types_.size();
 }
 
@@ -25,7 +25,7 @@ ValueType FuncType::paramType(uint32_t idx) {
     return param_types_.at(idx);
 }
 
-bool FuncType::hasReturnType() {
+bool FuncType::hasReturnType() const {
     return has_return_type_;
 }
 
@@ -34,7 +34,7 @@ void FuncType::setReturnType(ValueType type) {
     has_return_type_ = true;
 }
 
-ValueType FuncType::returnType() {
+ValueType FuncType::returnType() const {
     return return_type_;
 }
 

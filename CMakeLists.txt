@@ -21,6 +21,7 @@ SET (SRC_SECTION
 
 SET (SRC_INTERPRETER
     src/interpreter/interpreter.cpp
+    src/interpreter/stack.cpp
 )
 
 SET (SRC_FILES

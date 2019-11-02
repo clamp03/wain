@@ -689,7 +689,7 @@ InitExpr* SectionsV1::loadInitExpr() {
 }
 
 #define DefineGetSectionFunc(type, field)            \
-    type##Section* SectionsV1::get##type##Section() {\
+    type##Section* SectionsV1::get##type##Section() const {\
         return field##_section_;                     \
     }
 DefineGetSectionFunc(Type, type);

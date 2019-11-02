@@ -43,15 +43,15 @@ public:
     virtual bool loadCodeSection() = 0;
     virtual bool loadDataSection() = 0;
 
-    virtual TypeSection* getTypeSection() = 0;
-    virtual ImportSection* getImportSection() = 0;
-    virtual FunctionSection* getFunctionSection() = 0;
-    virtual TableSection* getTableSection() = 0;
-    virtual MemorySection* getMemorySection() = 0;
-    virtual GlobalSection* getGlobalSection() = 0;
-    virtual ExportSection* getExportSection() = 0;
-    virtual ElementSection* getElementSection() = 0;
-    virtual CodeSection* getCodeSection() = 0;
-    virtual DataSection* getDataSection() = 0;
+    virtual TypeSection* getTypeSection() const = 0;
+    virtual ImportSection* getImportSection() const = 0;
+    virtual FunctionSection* getFunctionSection() const = 0;
+    virtual TableSection* getTableSection() const = 0;
+    virtual MemorySection* getMemorySection() const = 0;
+    virtual GlobalSection* getGlobalSection() const = 0;
+    virtual ExportSection* getExportSection() const = 0;
+    virtual ElementSection* getElementSection() const = 0;
+    virtual CodeSection* getCodeSection() const = 0;
+    virtual DataSection* getDataSection() const = 0;
 };
 #endif // SECTION_H

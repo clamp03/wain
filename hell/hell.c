@@ -3,5 +3,5 @@ int x2(int x) {
 }
 
 int main() {
-    return x2(1);
+    return x2(3);
 }

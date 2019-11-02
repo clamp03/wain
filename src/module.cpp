@@ -14,6 +14,7 @@ Module::Module()
 Module::~Module() {
     if (sections_) {
         free(sections_);
+        sections_ = nullptr;
     }
 }
 
@@ -81,9 +82,9 @@ bool Module::run() {
             entry->getKind() == ExternalKind::Function &&
             strncmp((const char*)entry->getFieldStr(), "main", 4) == 0)
         {
-            CodeSection* codes = sections_->getCodeSection();
-            const FunctionBody* body = codes->getFunctionBody(entry->getIndex());
-            Interpreter::run(body);
+            Interpreter inter(sections_);
+            int32_t val = inter.start(entry->getIndex());
+            printf("%d\n", val);
             return true;
         }
     }

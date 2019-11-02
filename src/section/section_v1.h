@@ -30,16 +30,16 @@ public:
     virtual bool loadCodeSection();
     virtual bool loadDataSection();
 
-    virtual TypeSection* getTypeSection();
-    virtual ImportSection* getImportSection();
-    virtual FunctionSection* getFunctionSection();
-    virtual TableSection* getTableSection();
-    virtual MemorySection* getMemorySection();
-    virtual GlobalSection* getGlobalSection();
-    virtual ExportSection* getExportSection();
-    virtual ElementSection* getElementSection();
-    virtual CodeSection* getCodeSection();
-    virtual DataSection* getDataSection();
+    virtual TypeSection* getTypeSection() const;
+    virtual ImportSection* getImportSection() const;
+    virtual FunctionSection* getFunctionSection() const;
+    virtual TableSection* getTableSection() const;
+    virtual MemorySection* getMemorySection() const;
+    virtual GlobalSection* getGlobalSection() const;
+    virtual ExportSection* getExportSection() const;
+    virtual ElementSection* getElementSection() const;
+    virtual CodeSection* getCodeSection() const;
+    virtual DataSection* getDataSection() const;
 
 private:
     InitExpr* loadInitExpr();

@@ -19,7 +19,11 @@ public:
     void addLocal(Local* local);
     void addInstruction(Instruction* inst);
 
-    uint32_t localCount();
+    uint32_t localCount() const;
+    uint32_t instructionCount() const;
+
+    const Local* getLocal(uint32_t idx) const;
+    const Instruction* getInstruction(uint32_t idx) const;
 
 private:
     std::vector<Local*> locals_;
@@ -29,9 +33,9 @@ private:
 
 class CodeSection {
 public:
-    uint32_t count();
+    uint32_t count() const;
     void addFunctionBody(FunctionBody* body);
-    const FunctionBody* getFunctionBody(uint32_t idx);
+    const FunctionBody* getFunctionBody(uint32_t idx) const;
 
 private:
     std::vector<FunctionBody*> bodies_;
