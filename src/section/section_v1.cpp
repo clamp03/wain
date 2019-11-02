@@ -276,6 +276,7 @@ bool SectionsV1::loadCodeSection() {
             Instruction* inst;
             opcode = loader_.loadOpcode();
             switch (opcode) {
+#if 0
             case UnreachableOpcode:
                 inst = new(AllocateClassInstance(mem_, Unreachable)) Unreachable();
                 break;
@@ -297,10 +298,12 @@ bool SectionsV1::loadCodeSection() {
             case ElseOpcode:
                 inst = new(AllocateClassInstance(mem_, Else)) Else();
                 break;
+#endif
             case EndOpcode:
                 block--;
                 inst = new(AllocateClassInstance(mem_, End)) End();
                 break;
+#if 0
             case BrOpcode:
                 inst = new(AllocateClassInstance(mem_, Br)) Br(loader_.loadVarUint32());
                 break;
@@ -320,18 +323,22 @@ bool SectionsV1::loadCodeSection() {
             case ReturnOpcode:
                 inst = new(AllocateClassInstance(mem_, Return)) Return();
                 break;
+#endif
             case CallOpcode:
                 inst = new(AllocateClassInstance(mem_, Call)) Call(loader_.loadVarUint32());
                 break;
+#if 0
             case CallIndirectOpcode:
                 inst = new(AllocateClassInstance(mem_, CallIndirect)) CallIndirect(loader_.loadVarUint32(), loader_.loadVarUint1());
                 break;
             case DropOpcode:
                 inst = new(AllocateClassInstance(mem_, Drop)) Drop();
                 break;
+#endif
             case GetLocalOpcode:
                 inst = new(AllocateClassInstance(mem_, GetLocal)) GetLocal(loader_.loadVarUint32());
                 break;
+#if 0
             case SetLocalOpcode:
                 inst = new(AllocateClassInstance(mem_, SetLocal)) SetLocal(loader_.loadVarUint32());
                 break;
@@ -419,9 +426,11 @@ bool SectionsV1::loadCodeSection() {
             case GrowMemoryOpcode:
                 inst = new(AllocateClassInstance(mem_, GrowMemory)) GrowMemory(loader_.loadVarUint1());
                 break;
+#endif
             case I32ConstOpcode:
                 inst = new(AllocateClassInstance(mem_, I32Const)) I32Const(loader_.loadVarInt32());
                 break;
+#if 0
             case I64ConstOpcode:
                 inst = new(AllocateClassInstance(mem_, I64Const)) I64Const(loader_.loadVarInt64());
                 break;
@@ -531,9 +540,11 @@ bool SectionsV1::loadCodeSection() {
             case I32XorOpcode:
                 inst = new(AllocateClassInstance(mem_, I32Xor)) I32Xor();
                 break;
+#endif
             case I32ShlOpcode:
                 inst = new(AllocateClassInstance(mem_, I32Shl)) I32Shl();
                 break;
+#if 0
             case I32Shr_SOpcode:
                 inst = new(AllocateClassInstance(mem_, I32Shr_S)) I32Shr_S();
                 break;
@@ -612,6 +623,7 @@ bool SectionsV1::loadCodeSection() {
             case F64Reinterpret_I64Opcode:
                 inst = new(AllocateClassInstance(mem_, F64Reinterpret_I64)) F64Reinterpret_I64();
                 break;
+#endif
             default:
                 NOT_YET_IMPLEMENTED
             }
