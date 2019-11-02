@@ -1,5 +1,5 @@
 #ifndef SECTION_V1_H
-#define SECTION_V1_h
+#define SECTION_V1_H
 
 #include "memory.h"
 #include "loader.h"

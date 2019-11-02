@@ -617,6 +617,7 @@ bool SectionsV1::loadCodeSection() {
             }
             body->addInstruction(inst);
         } while (block != 0 || opcode != 0xb);
+        code_section_->addFunctionBody(body);
     }
 
     return true;

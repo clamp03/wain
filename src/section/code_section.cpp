@@ -24,3 +24,9 @@ uint32_t CodeSection::count() {
 void CodeSection::addFunctionBody(FunctionBody* body) {
     bodies_.emplace_back(body);
 }
+
+const FunctionBody* CodeSection::getFunctionBody(uint32_t idx)
+{
+    DEV_ASSERT(idx < count(), "Indvalid Function Body Index");
+    return bodies_.at(idx);
+}

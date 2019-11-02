@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "module.h"
+#include "interpreter.h"
 #include "loader.h"
+#include "module.h"
 #include "section_v1.h"
 
 Module::Module()
@@ -72,6 +73,19 @@ bool Module::loadVersion(Loader& r) {
 
 
 bool Module::run() {
-    // TODO
-    return true;
+    ExportSection* exports = sections_->getExportSection();
+    for (int i = 0; i < exports->count(); i++)
+    {
+        const ExportEntry* entry = exports->getExportEntry(i);
+        if (entry->getFieldLen() == 4 &&
+            entry->getKind() == ExternalKind::Function &&
+            strncmp((const char*)entry->getFieldStr(), "main", 4) == 0)
+        {
+            CodeSection* codes = sections_->getCodeSection();
+            const FunctionBody* body = codes->getFunctionBody(entry->getIndex());
+            Interpreter::run(body);
+            return true;
+        }
+    }
+    return false;
 }

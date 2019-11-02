@@ -31,6 +31,7 @@ class CodeSection {
 public:
     uint32_t count();
     void addFunctionBody(FunctionBody* body);
+    const FunctionBody* getFunctionBody(uint32_t idx);
 
 private:
     std::vector<FunctionBody*> bodies_;

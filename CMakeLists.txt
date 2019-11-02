@@ -19,12 +19,17 @@ SET (SRC_SECTION
     src/section/data_section.cpp
 )
 
+SET (SRC_INTERPRETER
+    src/interpreter/interpreter.cpp
+)
+
 SET (SRC_FILES
     src/main.cpp
     src/loader/loader.cpp
     src/memory/memory.cpp
     src/type.cpp
     src/module.cpp
+    ${SRC_INTERPRETER}
     ${SRC_SECTION}
 )
 
@@ -32,4 +37,4 @@ ADD_EXECUTABLE (${TARGET} ${SRC_FILES})
 SET_TARGET_PROPERTIES(${TARGET} PROPERTIES
     COMPILE_FLAGS "-std=c++11 -g"
 )
-TARGET_INCLUDE_DIRECTORIES(${TARGET} PRIVATE src/ src/loader src/memory src/section)
+TARGET_INCLUDE_DIRECTORIES(${TARGET} PRIVATE src/ src/interpreter src/loader src/memory src/section)
