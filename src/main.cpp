@@ -6,7 +6,7 @@ class Module;
 int main(int argc, char* argv[]) {
     if (argc != 2) {
         std::cerr << "Invalid usage" << std::endl;
-        std::cerr << "./wasmIntrp <file name>" << std::endl;
+        std::cerr << "./wain <file name>" << std::endl;
         return -1;
     }
 
