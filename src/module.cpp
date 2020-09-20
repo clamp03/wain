@@ -32,7 +32,10 @@ bool Module::loadFile(const char* fname) {
 
     buf = (uint8_t*)malloc(sizeof(uint8_t) * size);
     rewind(fp);
-    fread(buf, 1, size, fp);
+    size_t s = fread(buf, 1, size, fp);
+    if (s != size)
+        return false;
+
     load(buf, size);
 
     free(buf);

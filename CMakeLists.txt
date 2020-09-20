@@ -39,3 +39,6 @@ SET_TARGET_PROPERTIES(${TARGET} PROPERTIES
     COMPILE_FLAGS "-std=c++11 -g"
 )
 TARGET_INCLUDE_DIRECTORIES(${TARGET} PRIVATE src/ src/interpreter src/loader src/memory src/section)
+
+INCLUDE (CTest)
+ADD_TEST(NAME test COMMAND wain ./hell/hell.wasm)
